@@ -180,6 +180,7 @@ namespace Reference_Enflow_Builder {
         }
         private void AddToList_Click(object sender, RoutedEventArgs e) {
             if(sender is Button button && button.DataContext is ProgramModel model) {
+                
                 string entryName = NewFieldNameEntry.Text;
                 string entryType = NewFieldTypeEntry.SelectedValue as string;
                 model.Application.Fields.Add(entryName, entryType);
@@ -199,7 +200,67 @@ namespace Reference_Enflow_Builder {
         }
 
         private void RemoveEntry_Click(object sender, RoutedEventArgs e) {
+            if (sender is Button button && button.DataContext is ProgramModel model) {
 
+                string entryName = NewFieldNameEntry.Text;
+                model.Application.Fields.Remove(entryName);
+                ApplicationFieldsList.GetBindingExpression(ListBox.ItemsSourceProperty).UpdateTarget();
+                ApplicationFieldsList.Items.Refresh();
+            }
+        }
+
+        private void DefinitionList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+
+        }
+
+        private void RemoveItemDefinition_Click(object sender, RoutedEventArgs e) {
+            if(e.OriginalSource is Button button && button.DataContext is KeyValuePair<string, Data> data_item) {
+                ProgramModel.Definitions.Remove(data_item.Key);
+            }
+        }
+
+        private void RemoveTableDefinition_Click(object sender, RoutedEventArgs e) {
+            if (e.OriginalSource is Button button && button.DataContext is KeyValuePair<string, Enflow.Data> data_item) {
+                ProgramModel.Definitions.Remove(data_item.Key);
+            }
+
+        }
+
+        private void AddTableDefinition_Click(object sender, RoutedEventArgs e) {
+            Enflow.Table table = new Enflow.Table {
+                Format = "String",
+                Entries = { }
+            };
+            ProgramModel.Definitions.Add(DefinitionName.Text, table);
+            DefinitionList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+        }
+
+        private void AddItemDefinition_Click(object sender, RoutedEventArgs e) {
+            Data newData = new Data { Format = "String" };
+
+            ProgramModel.Definitions.Add(DefinitionName.Text, newData) ;
+            DefinitionList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+        }
+
+        private void OptionValueSelector_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (e.OriginalSource is ComboBox combobox && combobox.DataContext is SuggestableIndexerItemView<string> item) {
+                item.Value = (string)combobox.SelectedValue;
+
+                if(combobox.Parent is Panel parent && parent.DataContext is not null) {
+
+                }
+            }
+
+        }
+
+        private void ResetInput_Click(object sender, RoutedEventArgs e) {
+            ProgramModel.Input = null;
+        }
+
+        private void TestInput_Click(object sender, RoutedEventArgs e) {
+            Dictionary<string, string> input_data  = ProgramModel.Input.InputDictionary;
+            Result result = ProgramModel.Program.Process(input_data) as Result;
+            ProcessResult.Text = (string)result;
         }
     }
 }

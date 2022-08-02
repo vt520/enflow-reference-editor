@@ -12,7 +12,7 @@
         DataContext="{Binding Source={StaticResource Library}, Path=DefaultProgramModel}">
     <Window.Resources>
         <local:EntriesConverter x:Key="EntriesConverter"/>
-        <local:EditableDictionaryConverter x:Key="EditableDictionaryConverter"/>
+        <local:IndexerConverter x:Key="InderxerConverter"/>
         <local:DefinitionsViewSelector x:Key="DefinitionsViewSelector"/>
         <local:OptionsViewSelector x:Key="OptionsViewSelector"/>
 
@@ -23,22 +23,51 @@
         <enflow:FieldCollection x:Key="FieldCollection"/>
 
         <DataTemplate x:Key="SuggestableOption">
-          
-                    <StackPanel>
-                        <TextBlock Text="{Binding Property}"/>
-                        <TextBox Text="{Binding Value}"/>
-                    </StackPanel>
-          
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                    Grid.Column="0"
+                    Margin="0,0,5,0">
+                    <Run Text="{Binding Property, Mode=OneWay}"/>
+                </TextBlock>
+
+                <ComboBox
+                    SelectedValuePath="Value"
+                    SelectedValue="{Binding Value, Mode=OneWay}"
+                    Grid.Column="1"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding Items, Mode=OneWay}"
+                    SelectionChanged="OptionValueSelector_SelectionChanged"
+                    Name="OptionValueSelector"/>
+            </Grid>
         </DataTemplate>
 
         <DataTemplate x:Key="FreeOption">
-
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                    Grid.Column="0"
+                    Margin="0,0,5,0">
+                    <Run Text="{Binding Property, Mode=OneWay}"/>
+                </TextBlock>
+                <TextBox 
+                    Grid.Column="1"
+                    Text="{Binding Value}"/>
+            </Grid>
         </DataTemplate>
+
         <DataTemplate x:Key="SimpleDefinitionView">
-            <Grid >
+            <Grid Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -47,37 +76,51 @@
                 <TextBlock
                     Grid.Row="0"
                     Grid.Column="0">
-                    <Run Text="{Binding Key, Mode=OneWay}"/> 
+                    <Run Text="{Binding Key, Mode=OneWay}"/>
                 </TextBlock>
                 <ComboBox 
                     Grid.Row="0"
                     Grid.Column="1"
-                    ItemsSource="{Binding Source={StaticResource Library}, 
-                    Path=TypeProcessors}" 
+                    ItemsSource="{Binding Source={StaticResource Library}, Path=TypeProcessors}" 
+                    Margin="5"
                     SelectedValue="{Binding Value.Processor}"/>
                 <TextBox 
                     Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
+                    Margin="5"
                     Text="{Binding Value.Value}"></TextBox>
+                <Button
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Click="RemoveItemDefinition_Click"
+                    Name="RemoveItemDefinition">
+                    Remove Item
+                </Button>
+                
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="ComplexDefinitionView">
-            <Grid>
+            <Grid Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     Grid.Row="0"
+                    Margin="5"
                     Grid.Column="0">
                     <Run Text="{Binding Key, Mode=OneWay}"/> (<Run Text="{Binding Value.Processor.Name, Mode=OneWay}"/>)
                 </TextBlock>
                 <ComboBox 
+                    Margin="5"
                     Grid.Row="0"
                     Grid.Column="1"
                     ItemsSource="{Binding Source={StaticResource Library}, 
@@ -89,11 +132,11 @@
                     Grid.ColumnSpan="2"
                     DataContext="{Binding Value}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="150"  MaxHeight="150"/>
+                        <RowDefinition Height="Auto"  MaxHeight="150"/>
                     </Grid.RowDefinitions>
-                        <DataGrid 
-                            Grid.Row="0"
-                            Grid.Column="0"
+                    <DataGrid 
+                        Grid.Row="0"
+                        Grid.Column="0"
                         CanUserAddRows="True"
                         AddingNewItem="DataGrid_AddingNewItem"
                         CanUserDeleteRows="True"
@@ -104,17 +147,22 @@
                         MinColumnWidth="300"
                         ScrollViewer.CanContentScroll="True"
                         VerticalScrollBarVisibility="Auto">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Entries" Binding="{Binding Value}" Width="Auto">
-                                </DataGridTextColumn>
-
-                            </DataGrid.Columns>
-                        </DataGrid>
-
-                    
-                    
+                        <DataGrid.Columns>
+                            <DataGridTextColumn 
+                                Header="Entries" 
+                                Binding="{Binding Value}" 
+                                Width="Auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
-                
+                <Button
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Click="RemoveTableDefinition_Click"
+                    Name="RemoveTableDefinition">
+                    Remove Table
+                </Button>
             </Grid>
         </DataTemplate>
         <Style x:Key="TreeViewItemStyle_ExpandAll" TargetType="{x:Type TreeViewItem}">
@@ -322,13 +370,17 @@
                                 </TextBlock>
 
                             </TabItem.Header>
-                            <ListView 
-                                d:ItemsSource="{Binding Source={StaticResource DefaultOptions}, Converter={StaticResource EditableDictionaryConverter}}"
-                                
-                                ItemsSource="{Binding ElementName=OutcomeTree, Path=SelectedValue.Options, Converter={StaticResource EditableDictionaryConverter}}"
-                                ItemTemplateSelector="{DynamicResource OptionsViewSelector}"
-                                x:Name="OutcomeOptions">
-                            </ListView>
+                            <ScrollViewer>
+                                <ItemsControl 
+                                d:ItemsSource="{Binding Source={StaticResource DefaultOptions}, Converter={StaticResource InderxerConverter}}"
+                                    HorizontalContentAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    ItemsSource="{Binding ElementName=OutcomeTree, Path=SelectedValue.Options, Converter={StaticResource InderxerConverter}}"
+                                    ItemTemplateSelector="{DynamicResource OptionsViewSelector}"
+                                    x:Name="OutcomeOptions">
+                                </ItemsControl>
+                            </ScrollViewer>
+                            
                         </TabItem>
                         <TabItem
                             Name="DefinitionsEditorTab">
@@ -342,32 +394,48 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <ListView 
-                                    Grid.Row="0"
-                                    Grid.Column="0"
-                                    ItemsSource="{Binding Definitions}"
-                                    HorizontalContentAlignment="Stretch"
-                                    HorizontalAlignment="Stretch"
-                                    ItemTemplateSelector="{DynamicResource DefinitionsViewSelector}"
-                                    x:Name="DefinitionList"
-                                    BorderThickness="1">
-                                </ListView>
-                                <StackPanel
-                                    Grid.Column="0"
-                                    Grid.Row="1"
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Right">
-                                    <Button 
-                                        Content="Add Table"/>
-                                    <Button
-                                        Content="Add Item"/>
                                     
-                                </StackPanel>
-                            </Grid>
-                            
+                                </Grid.RowDefinitions>
+                                <ScrollViewer
+                                    Grid.Row="0"
+                                    Grid.Column="0">
+                                    <ItemsControl 
+                                    
+                                        ItemsSource="{Binding Definitions}"
+                                        HorizontalContentAlignment="Stretch"
+                                        HorizontalAlignment="Stretch"
+                                        ItemTemplateSelector="{DynamicResource DefinitionsViewSelector}"
+                                        Name="DefinitionList">
+                                    </ItemsControl>
+                                </ScrollViewer>
+                                
+                                <Grid
+                                    Grid.Column="0"
+                                    Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        Grid.Column="0"
+                                        Name="DefinitionName"/>
+                                    <Button 
+                                        Grid.Column="1"
+                                        Content="Add Table"
+                                        Click="AddTableDefinition_Click"
+                                        Name="AddTableDefinition"/>
+                                    <Button
+                                        Grid.Column="2"
+                                        Content="Add Item"
+                                        Click="AddItemDefinition_Click"
+                                        Name="AddItemDefinition"/>
 
-                            
+                                </Grid>
+                            </Grid>
+
+
+
                         </TabItem>
                         <TabItem>
                             <TabItem.Header>
@@ -380,38 +448,40 @@
                                 </Grid.RowDefinitions>
                                 <ScrollViewer
                                      Grid.Row="0">
-                                    <ListBox 
+                                    <ItemsControl 
                                         ItemsSource="{Binding Application.Fields.Enumerator}"
                                         HorizontalContentAlignment="Stretch"
                                         Name="ApplicationFieldsList">
-                                        <ListBox.ItemTemplate>
+                                        <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid Background="Pink">
+                                                <Grid 
+                                                    Margin="5">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <TextBox 
-                                                        Grid.Column="0"
-                                                        Text="{Binding Key, Mode=OneWay}" 
-                                                        TextChanged="FieldNameEntry_TextChanged"
-                                                        Name="FieldNameEntry"/>
+                                                            Grid.Column="0"
+                                                            Text="{Binding Key, Mode=OneWay}" 
+                                                            TextChanged="FieldNameEntry_TextChanged"
+                                                            Name="FieldNameEntry"/>
                                                     <ComboBox 
-                                                        Grid.Column="1"
-                                                        ItemsSource="{Binding Source={StaticResource FieldCollection}, Path=RegisteredTypeNames, TargetNullValue=no}"
-                                                        SelectedValue="{Binding Value, Mode=OneWay}" 
-                                                        SelectionChanged="FieldTypeEntry_SelectionChanged"
-                                                        Name="FieldTypeEntry"/>
+                                                            Grid.Column="1"
+                                                            ItemsSource="{Binding Source={StaticResource FieldCollection}, Path=RegisteredTypeNames, TargetNullValue=no}"
+                                                            SelectedValue="{Binding Value, Mode=OneWay}" 
+                                                            SelectionChanged="FieldTypeEntry_SelectionChanged"
+                                                            Name="FieldTypeEntry"/>
                                                     <Button 
-                                                        Grid.Column="2"
-                                                        Content="Remove" 
-                                                        Click="RemoveEntry_Click"
-                                                        Name="RemoveEntry"/>
+                                                            Grid.Column="2"
+                                                            Content="Remove" 
+                                                            Click="RemoveEntry_Click"
+                                                            Name="RemoveEntry"/>
                                                 </Grid>
                                             </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
+                                        </ItemsControl.ItemTemplate>
+
+                                    </ItemsControl>
                                 </ScrollViewer>
                                 <Grid
                                     Grid.Row="1">
@@ -422,7 +492,7 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBox
                                         Grid.Column="0"
-                                        Name="NewFieldNameEntry"/>
+                                        x:Name="NewFieldNameEntry"/>
 
                                     <ComboBox
                                         Grid.Column="1"
@@ -472,21 +542,46 @@
                             <TextBlock>Application Data Entry Here</TextBlock>
                         </Border>
 
-                        <StackPanel
+                        <Grid
                             Grid.Row="1"
                             Grid.Column="0"
                             Name="InputEditingArea">
-                            <TextBlock>This is the input editing area</TextBlock>
-                        </StackPanel>
+                            <ListBox
+                                HorizontalContentAlignment="Stretch"
+                                ItemsSource="{Binding Input.Items}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Grid.Column="0">
+                                                <Run Text="{Binding Name}"/>
+                                            </TextBlock>
+                                            <TextBox 
+                                                Grid.Column="1"
+                                                
+                                                Text="{Binding Value}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox> 
+                        </Grid>
 
                         <StackPanel 
                             Grid.Row="2"
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
                             <Button 
-                                Content="Reset Application"/>
+                                Content="Reset Application"
+                                Click="ResetInput_Click"
+                                Name="ResetInput"/>
                             <Button 
-                                Content="Submit"/>
+                                Content="Submit"
+                                Click="TestInput_Click"
+                                Name="TestInput"/>
                         </StackPanel>
                     </Grid>
                     <Grid
@@ -515,6 +610,11 @@
                                 Grid.Column="0">
                                 Process Result Code
                             </TextBlock>
+                            <TextBox 
+                                IsEnabled="False"
+                                Name="ProcessResult">
+                                
+                            </TextBox>
 
                             <TextBlock
                                 Grid.Row="0"
@@ -581,8 +681,8 @@
                     Name="Source" />
             </TabItem>
         </TabControl>
-        
+
         <!-- <local:OutcomeViewer DataContext="{Binding Qualifications}" Grid.Row="1" Grid.Column="1"/> -->
-        
+
     </Grid>
 </Window>

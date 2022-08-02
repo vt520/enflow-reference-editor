@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace Reference_Enflow_Builder {
-    public class EditableDictionaryConverter : IValueConverter {
+    public class IndexerConverter : IValueConverter {
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if(value is PropertyIndexer<string> string_indexer) {
                 return new PropertyIndexerView<string>(string_indexer);

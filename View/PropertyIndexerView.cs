@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Reference_Enflow_Builder.View {
-    public class PropertyIndexerView<T> : Model, IList<Model>, INotifyCollectionChanged {
+    public class PropertyIndexerView<T>: Model, IList<Model>, INotifyCollectionChanged {
 
         public PropertyIndexerView(PropertyIndexer<T> indexer) {
             PropertyIndexer = indexer;
@@ -128,23 +128,28 @@ namespace Reference_Enflow_Builder.View {
         public SuggestableIndexerItemView(PropertyIndexer<T> propertyIndexer, string key, PropertySuggestions<T> suggestions) : base(propertyIndexer, key) {
             this.suggestions = suggestions;
         }
+        public PropertySuggestions<T>? Items {
+            get {
+                return PropertyIndexer.AllowableValues(Property);
+            }
+        }
     }
 
     public class IndexerItemView<T> : Model {
-        private PropertyIndexer<T> propertyIndexer;
+        protected PropertyIndexer<T> PropertyIndexer;
         private string key;
         public string Property {
             get => key;
         }
-        public T Value {
-            get => propertyIndexer[Property];
+        public T? Value {
+            get => PropertyIndexer[Property];
             set {
-                if (value.Equals(propertyIndexer[Property])) return;
-                propertyIndexer.PropertyChanged -= PropertyIndexer_PropertyChanged;
+                if (value?.Equals(PropertyIndexer[Property]) is true) return;
+                PropertyIndexer.PropertyChanged -= PropertyIndexer_PropertyChanged;
 
-                propertyIndexer[Property] = value;
+                PropertyIndexer[Property] = value;
 
-                propertyIndexer.PropertyChanged += PropertyIndexer_PropertyChanged;
+                PropertyIndexer.PropertyChanged += PropertyIndexer_PropertyChanged;
             }
         }
 
@@ -153,7 +158,7 @@ namespace Reference_Enflow_Builder.View {
         }
 
         public IndexerItemView(PropertyIndexer<T> propertyIndexer, string key) {
-            this.propertyIndexer = propertyIndexer;
+            this.PropertyIndexer = propertyIndexer;
             this.key = key;
         }
     }
