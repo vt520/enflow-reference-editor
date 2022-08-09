@@ -2,6 +2,7 @@
 using Enflow.Engine;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,7 +82,11 @@ namespace Reference_Enflow_Builder.View {
                 return Program?.ToString();
             }
             set {
-                Program = (Program)value; 
+                try {
+                    Program = (Program)value;
+                } catch {
+
+                }
             }
           /*  get {
                 if (_Source is null || !_Source.Program.Equals(Program)) {
@@ -113,5 +118,37 @@ namespace Reference_Enflow_Builder.View {
             Definitions.CollectionChanged += Definitions_CollectionChanged;
             this.RegisterChangeEventProxy(Qualifications, null, nameof(Qualifications));
         }
+        private List<DataTypeEntry> _DataTypes = null;
+        public List<DataTypeEntry> DataTypes {
+            get {
+                if (_DataTypes is not null) return _DataTypes;
+                List < DataTypeEntry > result = new() {
+                    new DataTypeEntry {
+                        Type = typeof(Data),
+                        Name = "Data"
+                    }
+                };
+                foreach (Type type in Data.Types) {
+                    try {
+
+                        if (Activator.CreateInstance(type) is Data source) {
+                            result.Add(new DataTypeEntry { Name = source.Name, Type = type });
+                        }
+                    } catch {
+
+                    }
+                }
+                DataTypes = result;
+                return result;
+            }
+            set {
+                _DataTypes = value;
+                OnPropertyChangedAsync();
+            }
+        }
+    }
+    public class DataTypeEntry {
+        public Type Type { get; set; }
+        public string Name { get; set; }
     }
 }

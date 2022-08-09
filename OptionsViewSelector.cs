@@ -14,10 +14,16 @@ namespace Reference_Enflow_Builder {
             FrameworkElement? element = container as FrameworkElement;
             if (item is SuggestableIndexerItemView<string> property) {
                 return element.FindResource("SuggestableOption") as DataTemplate;
+            } else  if(item is IndexerItemView<string> indexed) {
+                return element.FindResource("FreeOption") as DataTemplate;
+            } else {
+
             }
-            return element.FindResource("FreeOption") as DataTemplate;
+            
 
             return base.SelectTemplate(item, container);
+        }
+        public OptionsViewSelector() {
         }
     }
 }

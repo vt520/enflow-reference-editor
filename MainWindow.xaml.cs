@@ -229,7 +229,7 @@ namespace Reference_Enflow_Builder {
         private void AddTableDefinition_Click(object sender, RoutedEventArgs e) {
             Enflow.Table table = new Enflow.Table {
                 Format = "String",
-                Entries = { }
+                Values = { }
             };
             ProgramModel.Definitions.Add(DefinitionName.Text, table);
             DefinitionList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
@@ -259,8 +259,78 @@ namespace Reference_Enflow_Builder {
 
         private void TestInput_Click(object sender, RoutedEventArgs e) {
             Dictionary<string, string> input_data  = ProgramModel.Input.InputDictionary;
-            Result result = ProgramModel.Program.Process(input_data) as Result;
+            Program program = ProgramModel.Program;
+            Result result = program.Process(input_data) as Result;
             ProcessResult.Text = (string)result;
+        }
+
+        private void AddDefinitionObject_Click(object sender, RoutedEventArgs e) {
+            if(DataTypeSelector.SelectedValue is DataTypeEntry selected_entry) {
+                if(Activator.CreateInstance(selected_entry.Type) is Data new_entry) {
+                    try {
+                        if (new_entry.Format is null) new_entry.Format = "Empty";
+                        ProgramModel.Definitions.Add(DefinitionName.Text, new_entry);
+                        DefinitionList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+                        DefinitionName.Text = "";
+                    } catch {
+
+                    }
+                }
+                
+
+            }
+
+        }
+
+        private void DefinitionName_TextChanged(object sender, TextChangedEventArgs e) {
+            if(sender is TextBox textbox) {
+                UpdateDefinitionAdderEnabled();
+            }
+
+        }
+
+        private void UpdateDefinitionAdderEnabled() {
+            bool enabled = (DefinitionName.Text != "") && (!ProgramModel.Definitions.ContainsKey(DefinitionName.Text));
+            AddDefinitionObject.IsEnabled = enabled && DataTypeSelector.SelectedValue is not null;
+        }
+        private void DataTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if(sender is ComboBox combobox) {
+                UpdateDefinitionAdderEnabled();
+            }
+        }
+
+        private void ProcessOutcome_Click(object sender, RoutedEventArgs e) {
+            try {
+                Result result = (Result)ProcessResultText.Text;
+                if(result.IsValid && result.IsSealed) {
+                    ResultMachineState.Text = result.Complete();
+                } else {
+                    if (result.IsSealed) {
+                        ResultMachineState.Text = "Validation Failed, object signature error";
+                    } else {
+                        ResultMachineState.Text = "A Valid Seal is Required For Processing";
+                    }
+                    
+                }
+                
+
+            } catch (Exception ex) {
+                ResultMachineState.Text = ex.ToString();
+            }
+        }
+
+        private void NewFieldNameEntry_TextChanged(object sender, TextChangedEventArgs e) {
+
+            if (sender is TextBox textbox && textbox.DataContext is ProgramModel model) {
+
+                string entryName = NewFieldNameEntry.Text;
+                AddNewField.IsEnabled = NewFieldNameEntry.Text != String.Empty &&  !model.Application.Fields.ContainsKey(entryName);
+
+            }
+        }
+
+        private void DataTypeSelector_Loaded(object sender, RoutedEventArgs e) {
+            DataTypeSelector.SelectedIndex = 0;
         }
     }
 }

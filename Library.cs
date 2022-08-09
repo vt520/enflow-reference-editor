@@ -2,6 +2,7 @@
 using Enflow.Decisions;
 using Enflow.Engine;
 using Enflow.Outcomes;
+using Enflow.Supplied;
 using Reference_Enflow_Builder.View;
 using System;
 using System.Collections.Generic;
@@ -28,52 +29,51 @@ namespace Reference_Enflow_Builder {
         }
         public static dynamic Programs { get; } = new {
             Default = new Program {
-                Application = {
-                        Fields = {
-                            { "name", "String" },
-                            { "address", "Address" },
-                            { "city", "String" },
-                            { "income", "Float" },
-                            { "residents", "Integer" }
-                        }
-                    },
+               Application = {
+                    Fields = {
+                        { "name", "String" },
+                        { "address", "Address" },
+                        { "income", "Float" },
+                        { "residents", "Integer" }
+                    }
+                },
 
                 Definitions = {
-                        { "max_income", new Data {
-                            Value = "100000.00", Format = "Float"
-                        }},
-                        { "min_income", new Data {
-                            Value = "100.00", Format = "Float"
-                        }},
-                        { "large_household", new Data {
-                            Value = "6", Format = "Integer"
-                        }},
-                        { "service_locations", new Table {
-                            Format = "City",
-                            Entries = {
-                                "Okay, NC",
-                                "Oakland, CA",
-                                "Santa Cruz, CA",
-                                "Watsonville, CA"
-                            }
-                        }}
-                    },
+                    { "max_income", new Data {
+                        Value = "100000.00", Format = "Float"
+                    }},
+                    { "min_income", new Data {
+                        Value = "1.00", Format = "Float"
+                    }},
+                    { "large_household", new Data {
+                        Value = "6", Format = "Integer"
+                    }},
+                    { "service_locations", new Table {
+                        Format = "City",
+                        Values = {
+                            "San Diego, CA",
+                            "Oakland, CA",
+                            "Santa Cruz, CA",
+                            "Watsonville, CA"
+                        }
+                    }}
+                },
 
                 Qualifications = new MatchesListItem {
-                    From = "Application:address",
-                    ComparedTo = "Definitions:service_locations",
+                    From = $"{Program.Sections.Input}:address",
+                    ComparedTo = $"{Program.Sections.Definition}:service_locations",
                     Yes = new GreaterThan {
-                        From = "Application:income",
-                        ComparedTo = "Definitions:max_income",
+                        From = $"{Program.Sections.Input}:income",
+                        ComparedTo = $"{Program.Sections.Definition}:max_income",
                         Yes = new LessThan { // really GTEQ in Disguise
-                            From = "Application:residents",
-                            ComparedTo = "Definitions:large_household",
+                            From = $"{Program.Sections.Input}:residents",
+                            ComparedTo = $"{Program.Sections.Definition}:large_household",
                             Yes = new Reject(),
                             No = new Accept()
                         },
                         No = new GreaterThan {
-                            From = "Application:income",
-                            ComparedTo = "Definitions:min_income",
+                            From = $"{Program.Sections.Input}:income",
+                            ComparedTo = $"{Program.Sections.Definition}:min_income",
                             Yes = new Accept(),
                             No = new Reject()
                         }
