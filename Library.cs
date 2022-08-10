@@ -28,27 +28,39 @@ namespace Reference_Enflow_Builder {
             get => TypeProcessor.Processors.Values.ToList();
         }
         public static dynamic Programs { get; } = new {
+            Empty = new Program {
+                Application = {
+                    Fields = {{"name", "String"}}
+                },
+                Definitions = {
+                    {"approved applicants", new Table {
+                        Format = "String",
+                        Values = { }
+                    }}
+                }
+            },
+
             Default = new Program {
                Application = {
                     Fields = {
-                        { "name", "String" },
-                        { "address", "Address" },
-                        { "income", "Float" },
-                        { "residents", "Integer" }
+                        { "Full Name", "String" },
+                        { "Address", "Address" },
+                        { "Household Income", "Float" },
+                        { "Household Members", "Integer" }
                     }
                 },
 
                 Definitions = {
-                    { "max_income", new Data {
+                    { "Maximum Income", new Data {
                         Value = "100000.00", Format = "Float"
                     }},
-                    { "min_income", new Data {
+                    { "Minimum Income", new Data {
                         Value = "1.00", Format = "Float"
                     }},
-                    { "large_household", new Data {
+                    { "Large Household Exemption", new Data {
                         Value = "6", Format = "Integer"
                     }},
-                    { "service_locations", new Table {
+                    { "Service Locations", new Table {
                         Format = "City",
                         Values = {
                             "San Diego, CA",
@@ -59,23 +71,29 @@ namespace Reference_Enflow_Builder {
                     }}
                 },
 
-                Qualifications = new MatchesListItem {
-                    From = $"{Program.Sections.Input}:address",
-                    ComparedTo = $"{Program.Sections.Definition}:service_locations",
-                    Yes = new GreaterThan {
-                        From = $"{Program.Sections.Input}:income",
-                        ComparedTo = $"{Program.Sections.Definition}:max_income",
-                        Yes = new LessThan { // really GTEQ in Disguise
-                            From = $"{Program.Sections.Input}:residents",
-                            ComparedTo = $"{Program.Sections.Definition}:large_household",
-                            Yes = new Reject(),
-                            No = new Accept()
-                        },
-                        No = new GreaterThan {
-                            From = $"{Program.Sections.Input}:income",
-                            ComparedTo = $"{Program.Sections.Definition}:min_income",
-                            Yes = new Accept(),
-                            No = new Reject()
+                Qualifications = new IsNotEmpty {
+                    Title = "Ensure the Name Section is Completed",
+                    From = $"{Program.Sections.Input}:Full Name",
+                    Yes = new MatchesListItem {
+                        Title = "Check if they are in the service area",
+                        From = $"{Program.Sections.Input}:Address",
+                        ComparedTo = $"{Program.Sections.Definition}:Service Locations",
+                        Yes = new GreaterThan {
+                            Title = "Test to see if they are under the maximum income",
+                            From = $"{Program.Sections.Input}:Household Income",
+                            ComparedTo = $"{Program.Sections.Definition}:Maximum Income",
+                            Yes = new LessThan { // really GTEQ in Disguise
+                                Title = "See if they are exempt because of # of residents",
+                                From = $"{Program.Sections.Input}:Household Members",
+                                ComparedTo = $"{Program.Sections.Definition}:Large Household Exemption",
+                                Yes = new Reject(),
+                                No = new Accept()
+                            },
+                            No = new GreaterThan {
+                                Title = "Test if the application meets mimimum income requirements",
+                                From = $"{Program.Sections.Input}:Household Income",
+                                ComparedTo = $"{Program.Sections.Definition}:Minimum Income"
+                            }
                         }
                     }
                 }

@@ -32,34 +32,6 @@ namespace Reference_Enflow_Builder {
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e) {
-            Button.IsEnabled = false;
-            if(ReplacementSelector.SelectedItem is Type type) {
-                if(OutcomeTree.SelectedItem is Outcome outcome) {
-                    if(!outcome.CompatibleOutcomes.Contains(type)) {
-                        MessageBoxResult result = MessageBox.Show("Would you like to proceed?", "Outcome not fully compatible", MessageBoxButton.YesNo);
-                        if (result == MessageBoxResult.No) return;
-                    }
-                    Outcome? replaceent = Activator.CreateInstance(type) as Outcome;
-
-                    string path = OutcomeTree.SelectedValuePath;
-                    if (replaceent is Outcome) {
-                        Library.Instances.ReplacementOutcome = replaceent;
-                        outcome.ReplaceWith(replaceent);
-                        if (replaceent.IsRoot) {
-                            OutcomeTree.GetBindingExpression(TreeViewItem.ItemsSourceProperty).UpdateTarget();
-                            Source.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
-                        }
-                    }
-                    ReplacementSelector.SelectedItem = outcome.GetType();
-                }
-            }
-
-        }
-
-        private void ReplacementSelector_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            Button.IsEnabled = ReplacementSelector.SelectedItem is not null;
-        }
 
         private void TextBox_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e) {
 
@@ -262,6 +234,7 @@ namespace Reference_Enflow_Builder {
             Program program = ProgramModel.Program;
             Result result = program.Process(input_data) as Result;
             ProcessResult.Text = (string)result;
+            ProcessResultText.Text = (string)result;
         }
 
         private void AddDefinitionObject_Click(object sender, RoutedEventArgs e) {
@@ -331,6 +304,59 @@ namespace Reference_Enflow_Builder {
 
         private void DataTypeSelector_Loaded(object sender, RoutedEventArgs e) {
             DataTypeSelector.SelectedIndex = 0;
+        }
+
+        private void Title_Click(object sender, RoutedEventArgs e) {
+            if(sender is Button button) {
+                if(button.Parent is Grid grid && grid.FindName("Replacement") is ComboBox combo) {
+                    combo.Visibility = Visibility.Visible;
+                    button.Visibility = Visibility.Hidden;
+                    combo.Focus();
+                }
+            }
+        }
+
+        private void Replacement_LostFocus(object sender, RoutedEventArgs e) {
+            
+            if(sender is ComboBox combo) {
+                if (FocusManager.GetFocusedElement(this) is ComboBoxItem item) {
+             
+                    if(ItemsControl.ItemsControlFromItemContainer(item) is ComboBox parent) {
+                        if (parent == sender) return;
+                    }
+                }
+
+                if (combo.Parent is Grid grid && grid.FindName("Title") is Button button) {
+                    button.Visibility = Visibility.Visible;
+                    combo.Visibility = Visibility.Hidden;
+                }
+            }
+        }
+
+        private void Replacement_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+
+            if(sender is ComboBox combo) {
+                if(combo.DataContext is Outcome current) {
+                    if (combo.SelectedValue is Type selected_type) {
+                        Type current_type = current.GetType();
+                        if (current_type == selected_type) return;
+                        if (!current.CompatibleOutcomes.Contains(selected_type)) {
+                            MessageBoxResult result = MessageBox.Show("Cannot copy child Outcomes to new object, Would you like to proceed?", "Data Loss Warning", MessageBoxButton.YesNo);
+                            if (result == MessageBoxResult.No) {
+                                combo.SelectedValue = current_type;
+                                return;
+                            }
+                        }
+                        if (Activator.CreateInstance(selected_type) is Outcome replacement_outcome) {
+                            current.ReplaceWith(replacement_outcome);
+                            if(replacement_outcome.IsRoot) {
+                                OutcomeTree.GetBindingExpression(TreeViewItem.ItemsSourceProperty).UpdateTarget();
+                                Source.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

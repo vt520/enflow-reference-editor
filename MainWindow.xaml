@@ -74,6 +74,9 @@
                 </Grid>
             </Border>
         </DataTemplate>
+        <DataTemplate x:Key="IndexerOption" DataType="IndexerItemView">
+            
+        </DataTemplate>
 
         <DataTemplate x:Key="SuppliedDefinitionView">
             <Border
@@ -150,7 +153,6 @@
                         Name="RemoveItemDefinition">
                         Remove Item
                     </Button>
-
                 </Grid>
             </Border>
         </DataTemplate>
@@ -279,7 +281,16 @@
                                 VerticalAlignment="Center"
                                 Visibility="Collapsed"
                                 x:Name="VisIndicator">
-                                🖈<!-- 🔘🖈 -->
+                                📰<!-- 📖🔘🖈 -->
+                            </TextBlock>
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Visibility="Collapsed"
+                                x:Name="HidIndicator">
+                                🗞<!-- 📕🔘🖈 -->
                             </TextBlock>
                             <Border
                                 Background="{x:Static SystemColors.WindowBrush}"
@@ -298,7 +309,6 @@
                                     <ContentPresenter 
                                         Grid.Row="0" 
                                         ContentSource="Header"
-                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                         x:Name="PART_Header"/>
                                     <Border 
@@ -306,35 +316,94 @@
                                         Background="{x:Static SystemColors.WindowBrush}" 
                                         CornerRadius="5"
                                         Name="ItemsBorder">
-                                        <ItemsPresenter x:Name="ItemsHost" />
+                                        <StackPanel>
+                                            <Border
+                                                Margin="0,5,0,0"
+                                                BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Padding="0,5,0,0"
+                                                Name="OptionsArea">
+                                                <ItemsControl
+                                                    d:ItemsSource="{Binding Source={StaticResource DefaultOptions}, Converter={StaticResource InderxerConverter}}"
+                                                    HorizontalContentAlignment="Stretch"
+                                                    HorizontalAlignment="Stretch"
+                                                    ItemsSource="{Binding Options, Converter={StaticResource InderxerConverter}}"
+                                                    ItemTemplateSelector="{DynamicResource OptionsViewSelector}"
+                                                    x:Name="OutcomeOptions">
+                                                </ItemsControl>
+                                            </Border>
+                                            <ItemsPresenter x:Name="ItemsHost" />
+                                        </StackPanel>
+                                        
                                     </Border>
                                 </Grid>
 
                             </Border>
-                            <TextBlock 
+                            <Button 
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Margin="2"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                BorderBrush="Transparent"
+                                Background="Transparent"
+                                Click="Title_Click"
                                 x:Name="Title">
-                                <Run Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
-                            </TextBlock>
+                                <TextBlock
+                                    TextWrapping="Wrap">
+                                    <Run Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
+                                </TextBlock>
+                            </Button>
+                            <ComboBox
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                HorizontalAlignment="Left"
+                                Visibility="Hidden"
+                                Margin="2,3"
+                                SelectedItem="{Binding OutcomeType ,Mode=OneWay}"
+                                ItemsSource="{Binding ReplaceOrConvertOutcomes}"
+                                LostFocus="Replacement_LostFocus"
+                                SelectionChanged="Replacement_SelectionChanged"
+                                Name="Replacement">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                            (<Run Text="{Binding BaseType.Name, Mode=OneWay}"/>)
+                                            <Run Text="{Binding Name, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </Grid>
 
 
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsExpanded" Value="false">
                                 <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
-                                <Setter Property="Visibility" TargetName="VisIndicator" Value="Visible"/>
+                                <Setter Property="Visibility" TargetName="VisIndicator" Value="Collapsed"/>
+                                <Setter Property="Visibility" TargetName="HidIndicator" Value="Visible"/>
                             </Trigger>
+
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter Property="Visibility" TargetName="ItemsHost" Value="Visible"/>
+                                <Setter Property="Visibility" TargetName="VisIndicator" Value="Visible"/>
+                                <Setter Property="Visibility" TargetName="HidIndicator" Value="Collapsed"/>
+                            </Trigger>
+                            
                             <Trigger Property="IsSelected" Value="true">
                                 <Setter Property="Background" TargetName="SelectionIndicator" Value="{x:Static SystemColors.HighlightBrush}"/>
                                 <Setter Property="Foreground" TargetName="Label" Value="{x:Static SystemColors.HighlightTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="VisIndicator" Value="{x:Static SystemColors.HighlightTextBrush}"/>
+                                <Setter Property="Foreground" TargetName="HidIndicator" Value="{x:Static SystemColors.HighlightTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="Title" Value="{x:Static SystemColors.HighlightTextBrush}"/>
+                                <Setter Property="Visibility" TargetName="OptionsArea" Value="Visible"/>
+                                <!-- Here's where I'll set the visibility of the Options Area for highlighted elements-->
                             </Trigger>
                             <Trigger Property="IsSelected" Value="false">
                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextColor}}"/>
                                 <Setter Property="Background" TargetName="SelectionIndicator" Value="{x:Static SystemColors.ControlBrush}"/>
+                                <Setter Property="Visibility" TargetName="OptionsArea" Value="Collapsed"/>
+                                <!-- Here's where I'll set the visibility of the Options Area for deselected elements-->
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
@@ -344,6 +413,7 @@
                                 <Setter Property="Background" TargetName="SelectionIndicator" Value="{x:Static SystemColors.GrayTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="Label" Value="{x:Static SystemColors.ControlTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="VisIndicator" Value="{x:Static SystemColors.ControlTextBrush}"/>
+                                <Setter Property="Foreground" TargetName="HidIndicator" Value="{x:Static SystemColors.ControlTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="Title" Value="{x:Static SystemColors.ControlTextBrush}"/>
                             </MultiTrigger>
                             <Trigger Property="IsEnabled" Value="false">
@@ -358,12 +428,13 @@
     <Grid>
         <TabControl>
             <TabItem
-                Header="Outcome Designer"
+                Header="Process Designer"
                 Name="DesignerTab">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -372,14 +443,23 @@
                         Grid.Column="0"
                         Grid.Row="0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
+                        <Border
+                            BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
+                            BorderThickness="0,0,0,1">
+                            <TextBlock
+                                Margin="5">
+                                Outcome Builder
+                            </TextBlock>
+                        </Border>
                         <TreeView 
-                            Grid.Row="0" ItemsSource="{Binding Program.Outcomes.Values}" 
+                            Grid.Row="1" ItemsSource="{Binding Program.Outcomes.Values}" 
                             ItemContainerStyle="{StaticResource TreeViewItemStyle_ExpandAll}"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                             SelectedItemChanged="OutcomeTree_SelectedItemChanged"
+                            HorizontalContentAlignment="Stretch"
                             Loaded="OutcomeTree_Loaded"
                             Name="OutcomeTree" >
                             <TreeView.ItemTemplate>
@@ -395,35 +475,14 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox 
-                                Grid.Column="0" 
-                                ItemsSource="{Binding ElementName=OutcomeTree, Path=SelectedItem.ReplaceOrConvertOutcomes}" 
-                                SelectionChanged="ReplacementSelector_SelectionChanged"
-                                Name="ReplacementSelector">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock>
-                                            (<Run Text="{Binding BaseType.Name, Mode=OneWay}"/>)
-                                            <Run Text="{Binding Name, Mode=OneWay}"/>
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                            <Button 
-                                Grid.Column="1" 
-                                Content="Replace" 
-                                IsEnabled="{Binding ElementName=ReplacementSelector, Path=IsSelectionBoxHighlighted}" 
-                                Click="Button_Click" 
-                                HorizontalAlignment="Left" 
-                                Width="45"
-                                Name="Button" />
                         </Grid>
                     </Grid>
+                    <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
                     <TabControl
                         Grid.Row="0"
-                        Grid.Column="1"
+                        Grid.Column="2"
                         x:Name="Tabstrib">
-                        <TabItem
+                        <!--<TabItem
                             Name="OutcomeEditorTab">
                             <TabItem.Header>
                                 <TextBlock>
@@ -442,12 +501,10 @@
                                 </ItemsControl>
                             </ScrollViewer>
                             
-                        </TabItem>
+                        </TabItem>-->
                         <TabItem
-                            Name="DefinitionsEditorTab">
-                            <TabItem.Header>
-                                Definitions
-                            </TabItem.Header>
+                            x:Name="DefinitionsEditorTab" Height="25" VerticalAlignment="Top">
+                            <TabItem.Header>Defined Items</TabItem.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -466,8 +523,7 @@
                                         HorizontalContentAlignment="Stretch"
                                         HorizontalAlignment="Stretch"
                                         ItemTemplateSelector="{DynamicResource DefinitionsViewSelector}"
-                                        Name="DefinitionList">
-                                    </ItemsControl>
+                                        x:Name="DefinitionList"/>
                                 </ScrollViewer>
                                 <Grid
                                     Grid.Column="0"
@@ -481,7 +537,7 @@
                                         Grid.Column="0"
                                         TextChanged="DefinitionName_TextChanged"
                                         
-                                        Name="DefinitionName"/>
+                                        x:Name="DefinitionName"/>
 
                                     <ComboBox 
                                         Grid.Column="1"
@@ -489,21 +545,19 @@
                                         ItemsSource="{Binding DataTypes}"
                                         SelectionChanged="DataTypeSelector_SelectionChanged"
                                         Loaded="DataTypeSelector_Loaded"
-                                        Name="DataTypeSelector"/>
+                                        x:Name="DataTypeSelector"/>
                                     <Button
                                         Grid.Column="2"
                                         Content="Add Item"
                                         Click="AddDefinitionObject_Click"
                                         IsEnabled="False"
-                                        Name="AddDefinitionObject"/>
+                                        x:Name="AddDefinitionObject"/>
 
                                 </Grid>
                             </Grid>
                         </TabItem>
                         <TabItem>
-                            <TabItem.Header>
-                                Application
-                            </TabItem.Header>
+                            <TabItem.Header>Input Format</TabItem.Header>
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -514,7 +568,7 @@
                                     <ItemsControl 
                                         ItemsSource="{Binding Application.Fields.Enumerator}"
                                         HorizontalContentAlignment="Stretch"
-                                        Name="ApplicationFieldsList">
+                                        x:Name="ApplicationFieldsList">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid 
@@ -528,18 +582,18 @@
                                                             Grid.Column="0"
                                                             Text="{Binding Key, Mode=OneWay}" 
                                                             TextChanged="FieldNameEntry_TextChanged"
-                                                            Name="FieldNameEntry"/>
+                                                            x:Name="FieldNameEntry"/>
                                                     <ComboBox 
                                                             Grid.Column="1"
-                                                            ItemsSource="{Binding Source={StaticResource FieldCollection}, Path=RegisteredTypeNames, TargetNullValue=no}"
+                                                            ItemsSource="{Binding RegisteredTypeNames, Source={StaticResource FieldCollection}, TargetNullValue=no}"
                                                             SelectedValue="{Binding Value, Mode=OneWay}" 
                                                             SelectionChanged="FieldTypeEntry_SelectionChanged"
-                                                            Name="FieldTypeEntry"/>
+                                                            x:Name="FieldTypeEntry"/>
                                                     <Button 
                                                             Grid.Column="2"
                                                             Content="Remove" 
                                                             Click="RemoveEntry_Click"
-                                                            Name="RemoveEntry"/>
+                                                            x:Name="RemoveEntry"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -560,16 +614,16 @@
 
                                     <ComboBox
                                         Grid.Column="1"
-                                        ItemsSource="{Binding Source={StaticResource FieldCollection}, Path=RegisteredTypeNames}"
+                                        ItemsSource="{Binding RegisteredTypeNames, Source={StaticResource FieldCollection}}"
                                         SelectedValue="String"
-                                        Name="NewFieldTypeEntry"/>
+                                        x:Name="NewFieldTypeEntry"/>
 
                                     <Button
                                         Grid.Column="2"
                                         Content="Add Field"
                                         Click="AddToList_Click"
                                         IsEnabled="False"
-                                        Name="AddNewField"/>
+                                        x:Name="AddNewField"/>
                                 </Grid>
                             </Grid>
                         </TabItem>
