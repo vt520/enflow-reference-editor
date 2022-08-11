@@ -10,12 +10,12 @@ using System.Windows.Controls;
 
 namespace Reference_Enflow_Builder {
     public class OptionsViewSelector : DataTemplateSelector {
-        public override DataTemplate SelectTemplate(object item, DependencyObject container) {
+        public override DataTemplate? SelectTemplate(object item, DependencyObject container) {
             FrameworkElement? element = container as FrameworkElement;
             if (item is SuggestableIndexerItemView<string> property) {
-                return element.FindResource("SuggestableOption") as DataTemplate;
+                return element?.FindResource("SuggestableOption") as DataTemplate;
             } else if (item is IndexerItemView<string> indexed) {
-                return element.FindResource("FreeOption") as DataTemplate;
+                return element?.FindResource("FreeOption") as DataTemplate;
             }
 
 

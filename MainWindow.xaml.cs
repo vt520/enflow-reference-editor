@@ -2,6 +2,7 @@
 using Enflow.Engine;
 using Reference_Enflow_Builder.View;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Reference_Enflow_Builder {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window , INotifyPropertyChanged {
+    public partial class MainWindow : Window {
         public ProgramModel ProgramModel { get; set; } = new ProgramModel { 
             Program = Library.Programs.Default.Clone()
         };
@@ -85,7 +86,7 @@ namespace Reference_Enflow_Builder {
         }
 
 
-        private DependencyObject FindChildNamed(DependencyObject parent, string name) {
+        private DependencyObject? FindChildNamed(DependencyObject parent, string name) {
             if (parent is FrameworkElement element && element.Name == name) return parent; 
             for(int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++) {
                 if(VisualTreeHelper.GetChild(parent, i) is FrameworkElement child) {
@@ -123,8 +124,6 @@ namespace Reference_Enflow_Builder {
 
         private bool flagTextChanged = false;
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         private void TransientBox_TextChanged(object sender, TextChangedEventArgs e) {
             if (sender is TextBox text) {
                 if (flagTextChanged == false) {
@@ -154,10 +153,11 @@ namespace Reference_Enflow_Builder {
             if(sender is Button button && button.DataContext is ProgramModel model) {
                 
                 string entryName = NewFieldNameEntry.Text;
-                string entryType = NewFieldTypeEntry.SelectedValue as string;
+                string? entryType = NewFieldTypeEntry.SelectedValue as string;
                 model.Application.Fields.Add(entryName, entryType);
                 ApplicationFieldsList.GetBindingExpression(ListBox.ItemsSourceProperty).UpdateTarget();
                 ApplicationFieldsList.Items.Refresh();
+                NewFieldNameEntry.Text = "";
             }
 
         }
@@ -172,10 +172,9 @@ namespace Reference_Enflow_Builder {
         }
 
         private void RemoveEntry_Click(object sender, RoutedEventArgs e) {
-            if (sender is Button button && button.DataContext is ProgramModel model) {
-
-                string entryName = NewFieldNameEntry.Text;
-                model.Application.Fields.Remove(entryName);
+            if (sender is Button button && button.Parent is Panel parent) {
+                string? entryName = (parent.FindName("FieldNameEntry") as TextBlock)?.Text;
+                ProgramModel.Application.Fields.Remove(entryName);
                 ApplicationFieldsList.GetBindingExpression(ListBox.ItemsSourceProperty).UpdateTarget();
                 ApplicationFieldsList.Items.Refresh();
             }
@@ -230,9 +229,9 @@ namespace Reference_Enflow_Builder {
         }
 
         private void TestInput_Click(object sender, RoutedEventArgs e) {
-            Dictionary<string, string> input_data  = ProgramModel.Input.InputDictionary;
+            Dictionary<string, string?>? input_data  = ProgramModel.Input?.InputDictionary;
             Program program = ProgramModel.Program;
-            Result result = program.Process(input_data) as Result;
+            Result? result = program.Process(input_data) as Result;
             ProcessResult.Text = (string)result;
             ProcessResultText.Text = (string)result;
         }
@@ -240,16 +239,24 @@ namespace Reference_Enflow_Builder {
         private void AddDefinitionObject_Click(object sender, RoutedEventArgs e) {
             if(DataTypeSelector.SelectedValue is DataTypeEntry selected_entry) {
                 if(Activator.CreateInstance(selected_entry.Type) is Data new_entry) {
+                    IEnumerable source = DefinitionList.ItemsSource;
+                    //DefinitionList.ItemsSource = null;
                     try {
-                        if (new_entry.Format is null) new_entry.Format = "Empty";
+                        if (new_entry.Format is null) {
+                            new_entry.Format = "Empty";
+                            new_entry.Value = "";
+                        }
+
                         ProgramModel.Definitions.Add(DefinitionName.Text, new_entry);
-                        DefinitionList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
                         DefinitionName.Text = "";
                     } catch {
 
                     }
+
+                    //DefinitionList.ItemsSource = source;
+                    DefinitionList.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
                 }
-                
+
 
             }
 
@@ -351,12 +358,29 @@ namespace Reference_Enflow_Builder {
                             current.ReplaceWith(replacement_outcome);
                             if(replacement_outcome.IsRoot) {
                                 OutcomeTree.GetBindingExpression(TreeViewItem.ItemsSourceProperty).UpdateTarget();
-                                Source.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
                             }
                         }
                     }
                 }
             }
+        }
+
+        private void CompileSource_Click(object sender, RoutedEventArgs e) {
+            try {
+                ProgramModel.Program = (Program)Source.Text;
+            } catch (Exception ex) {
+                Source.Text = ex.ToString();
+            }
+            
+        }
+
+        private void RefreshSource_Click(object sender, RoutedEventArgs e) {
+            Source.Text = ProgramModel.Program;
+        }
+
+        private void CompleteResponse_Click(object sender, RoutedEventArgs e) {
+            ProcessResultText.Text = ResultMachineState.Text;
+            ProcessOutcome_Click(sender, e);
         }
     }
 }

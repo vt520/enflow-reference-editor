@@ -34,11 +34,14 @@ namespace Reference_Enflow_Builder.View {
             OnPropertyChangedAsync(nameof(Items));
         }
 
-        public Dictionary<string, string> InputDictionary {
+        public Dictionary<string, string?> InputDictionary {
             get {
-                Dictionary<string, string> buffer = new() { };
-                foreach (InputItem item in Items) {
-                    buffer.Add(item.Name, item.Value);
+                Dictionary<string, string?> buffer = new() { };
+                if(Items is not null) {
+                    foreach (InputItem item in Items) {
+                        if (item.Name is null) continue;
+                        buffer.Add(item.Name, item.Value);
+                    }
                 }
                 return buffer;
             }

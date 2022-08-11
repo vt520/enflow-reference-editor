@@ -48,7 +48,6 @@ namespace Reference_Enflow_Builder.View {
             OnPropertyChangedAsync(nameof(Definitions));
         }
 
-        private QualificationsView? _Qualifications = null;
         [DerivedFromProperty(nameof(Program))]
         public Outcome Qualifications {
             get => Program.Qualifications;
@@ -102,7 +101,7 @@ namespace Reference_Enflow_Builder.View {
 
         private InputView? _Input = null;
         [DerivedFromProperty(nameof(Program))]
-        public InputView Input {
+        public InputView? Input {
             get {
                 if (_Input is null || !_Input.Program.Equals(Program)) {
                     return Input = new() { Program = Program };
@@ -118,7 +117,7 @@ namespace Reference_Enflow_Builder.View {
             Definitions.CollectionChanged += Definitions_CollectionChanged;
             this.RegisterChangeEventProxy(Qualifications, null, nameof(Qualifications));
         }
-        private List<DataTypeEntry> _DataTypes = null;
+        private List<DataTypeEntry>? _DataTypes = null;
         public List<DataTypeEntry> DataTypes {
             get {
                 if (_DataTypes is not null) return _DataTypes;
@@ -148,7 +147,7 @@ namespace Reference_Enflow_Builder.View {
         }
     }
     public class DataTypeEntry {
-        public Type Type { get; set; }
-        public string Name { get; set; }
+        public Type Type { get; set; } = typeof(Object);
+        public string Name { get; set; } = typeof(Object).Name;
     }
 }

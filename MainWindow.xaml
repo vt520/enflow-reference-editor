@@ -8,7 +8,7 @@
         xmlns:enflow="clr-namespace:Enflow.Engine;assembly=enflow"
         xmlns:enflow_dec="clr-namespace:Enflow.Decisions;assembly=enflow"
         mc:Ignorable="d"
-        Title="EnFlow Reference Studio" Height="450" Width="800"
+        Title="EnFlow Reference Studio" Height="600" Width="800"
         DataContext="{Binding Source={StaticResource Library}, Path=DefaultProgramModel}">
     <Window.Resources>
         <local:EntriesConverter x:Key="EntriesConverter"/>
@@ -358,6 +358,7 @@
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
                                 Visibility="Hidden"
                                 Margin="2,3"
                                 SelectedItem="{Binding OutcomeType ,Mode=OneWay}"
@@ -515,11 +516,12 @@
 
                                 </Grid.RowDefinitions>
                                 <ScrollViewer
+                                    DataContext="{Binding Program}"
                                     Grid.Row="0"
                                     Grid.Column="0">
                                     <ItemsControl 
-                                    
-                                        ItemsSource="{Binding Definitions}"
+                                        
+                                        ItemsSource="{Binding Definitions, UpdateSourceTrigger=PropertyChanged}"
                                         HorizontalContentAlignment="Stretch"
                                         HorizontalAlignment="Stretch"
                                         ItemTemplateSelector="{DynamicResource DefinitionsViewSelector}"
@@ -534,6 +536,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBox
+                                        Margin="5"
                                         Grid.Column="0"
                                         TextChanged="DefinitionName_TextChanged"
                                         
@@ -541,12 +544,14 @@
 
                                     <ComboBox 
                                         Grid.Column="1"
+                                        Margin="5"
                                         DisplayMemberPath="Name"
                                         ItemsSource="{Binding DataTypes}"
                                         SelectionChanged="DataTypeSelector_SelectionChanged"
                                         Loaded="DataTypeSelector_Loaded"
                                         x:Name="DataTypeSelector"/>
                                     <Button
+                                        Margin="5"
                                         Grid.Column="2"
                                         Content="Add Item"
                                         Click="AddDefinitionObject_Click"
@@ -571,29 +576,36 @@
                                         x:Name="ApplicationFieldsList">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid 
-                                                    Margin="5">
+                                                <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBox 
-                                                            Grid.Column="0"
-                                                            Text="{Binding Key, Mode=OneWay}" 
-                                                            TextChanged="FieldNameEntry_TextChanged"
-                                                            x:Name="FieldNameEntry"/>
+                                                    <Border
+                                                        BorderBrush="{x:Static SystemColors.InactiveBorderBrush}"
+                                                        BorderThickness="0,0,0,1"
+                                                        Grid.Column="0"
+                                                        Grid.ColumnSpan="3"
+                                                        />
+                                                    <TextBlock 
+                                                        Grid.Column="0"
+                                                        Margin="5"
+                                                        Text="{Binding Key, Mode=OneWay}" 
+                                                        x:Name="FieldNameEntry"/>
                                                     <ComboBox 
-                                                            Grid.Column="1"
-                                                            ItemsSource="{Binding RegisteredTypeNames, Source={StaticResource FieldCollection}, TargetNullValue=no}"
-                                                            SelectedValue="{Binding Value, Mode=OneWay}" 
-                                                            SelectionChanged="FieldTypeEntry_SelectionChanged"
-                                                            x:Name="FieldTypeEntry"/>
+                                                        Margin="5"
+                                                        Grid.Column="1"
+                                                        ItemsSource="{Binding RegisteredTypeNames, Source={StaticResource FieldCollection}, TargetNullValue=no}"
+                                                        SelectedValue="{Binding Value, Mode=OneWay}" 
+                                                        SelectionChanged="FieldTypeEntry_SelectionChanged"
+                                                        x:Name="FieldTypeEntry"/>
                                                     <Button 
-                                                            Grid.Column="2"
-                                                            Content="Remove" 
-                                                            Click="RemoveEntry_Click"
-                                                            x:Name="RemoveEntry"/>
+                                                        Margin="5"
+                                                        Grid.Column="2"
+                                                        Content="Remove" 
+                                                        Click="RemoveEntry_Click"
+                                                        x:Name="RemoveEntry"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -608,12 +620,14 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBox
+                                        Margin="5"
                                         Grid.Column="0"
                                         TextChanged="NewFieldNameEntry_TextChanged"
                                         x:Name="NewFieldNameEntry"/>
 
                                     <ComboBox
                                         Grid.Column="1"
+                                        Margin="5"
                                         ItemsSource="{Binding RegisteredTypeNames, Source={StaticResource FieldCollection}}"
                                         SelectedValue="String"
                                         x:Name="NewFieldTypeEntry"/>
@@ -621,6 +635,7 @@
                                     <Button
                                         Grid.Column="2"
                                         Content="Add Field"
+                                        Margin="5"
                                         Click="AddToList_Click"
                                         IsEnabled="False"
                                         x:Name="AddNewField"/>
@@ -663,28 +678,34 @@
                             Grid.Row="1"
                             Grid.Column="0"
                             Name="InputEditingArea">
-                            <ListBox
+                            <ItemsControl
                                 HorizontalContentAlignment="Stretch"
                                 ItemsSource="{Binding Input.Items}">
-                                <ListBox.ItemTemplate>
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <TextBlock
-                                                Grid.Column="0">
+                                                Grid.Column="0"
+                                                Margin="5">
                                                 <Run Text="{Binding Name}"/>
                                             </TextBlock>
                                             <TextBox 
                                                 Grid.Column="1"
-                                                
+                                                Margin="5"
                                                 Text="{Binding Value}"/>
+                                            <Border
+                                                Grid.Column="0"
+                                                Grid.ColumnSpan="2"
+                                                BorderBrush="{x:Static SystemColors.InactiveBorderBrush}"
+                                                BorderThickness="0,0,0,1"/>
                                         </Grid>
                                     </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox> 
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl> 
                         </Grid>
 
                         <StackPanel 
@@ -692,10 +713,12 @@
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
                             <Button 
+                                Margin="5"
                                 Content="Reset Application"
                                 Click="ResetInput_Click"
                                 Name="ResetInput"/>
                             <Button 
+                                Margin="5"
                                 Content="Submit"
                                 Click="TestInput_Click"
                                 Name="TestInput"/>
@@ -760,9 +783,21 @@
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
                         <Button 
+                            Margin="5"
                             Content="Complete Outcome"
                             Click="ProcessOutcome_Click"
                             Name="ProcessOutcome"/>
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                        <Button 
+                            Margin="5"
+                            Content="Complete Response"
+                            Click="CompleteResponse_Click"
+                            Name="CompleteResponse"/>
                     </StackPanel>
 
                     <TextBlock
@@ -773,21 +808,46 @@
                     <TextBox
                         Grid.Row="1"
                         Grid.Column="1"
-                        Grid.RowSpan="2"
                         AcceptsReturn="True"
                         Name="ResultMachineState"/>
                 </Grid>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
-                    Source View
+                    Source and Compilation
                 </TabItem.Header>
-                <TextBox 
-                    Text="{Binding Source, UpdateSourceTrigger=PropertyChanged}" 
-                    AcceptsReturn="True" 
-                    ScrollViewer.CanContentScroll="True"
-                    VerticalScrollBarVisibility="Auto"
-                    Name="Source" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBox 
+                        Text="Select 'Serialize Program' to view program source"
+                        Grid.Row="0"
+                        AcceptsReturn="True" 
+                        ScrollViewer.CanContentScroll="True"
+                        VerticalScrollBarVisibility="Auto"
+                        TextWrapping="Wrap"
+                        Name="Source" />
+                    <StackPanel 
+                        Grid.Row="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                        <Button
+                            Click="RefreshSource_Click"
+                            Margin="5"
+                            x:Name="RefreshSource">
+                            Serialize Program
+                        </Button>
+                        <Button
+                            Click="CompileSource_Click"
+                            Margin="5"
+                            x:Name="CompileSource">
+                            Compile Program
+                        </Button>
+                    </StackPanel>
+
+                </Grid>
             </TabItem>
         </TabControl>
 

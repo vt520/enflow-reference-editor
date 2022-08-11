@@ -14,10 +14,10 @@ namespace Reference_Enflow_Builder.View {
         public PropertyIndexerView(PropertyIndexer<T> indexer) {
             PropertyIndexer = indexer;
             foreach (string key in PropertyIndexer.Keys) {
-                Model item = null;
+                Model? item = null;
                 if(PropertyIndexer?.AllowableValues(key) is PropertySuggestions<T> suggestions) {
                     item = new SuggestableIndexerItemView<T>(PropertyIndexer, key, suggestions);
-                } else {
+                } else if(PropertyIndexer is not null) {
                     item = new IndexerItemView<T>(PropertyIndexer, key);
                 }
                 if(item is not null) Items.Add(item);

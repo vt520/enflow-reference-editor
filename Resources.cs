@@ -26,13 +26,6 @@ namespace Reference_Enflow_Builder {
             }
         }
 
-        [DerivedFromProperty(nameof(Program))]
-        public object SourceView { get; set; }
-
-        [DerivedFromProperty(nameof(Program))]
-        public object DefinitionsView { get; set; }
-
-        
         public static Dispatcher Dispatcher {
             get => App.Current.Dispatcher;
         }

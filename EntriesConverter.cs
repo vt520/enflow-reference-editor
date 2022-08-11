@@ -36,6 +36,7 @@ namespace Reference_Enflow_Builder {
                             if(e.OldItems is null) return;
                             foreach(object item in e.OldItems) {
                                 if (item is EntryViewItem entry) {
+                                    if (entry.Value is null) continue;
                                     if (entry.Source is not null) entry.Source.Remove(entry.Value);
                                 }
                             }
