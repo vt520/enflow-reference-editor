@@ -51,6 +51,7 @@ namespace Reference_Enflow_Builder {
                 },
 
                 Definitions = {
+                    { "Fibby", new Fibonacci() },
                     { "Maximum Income", new Data {
                         Value = "100000.00", Format = "Float"
                     }},

@@ -14,6 +14,8 @@
         <local:EntriesConverter x:Key="EntriesConverter"/>
         <local:IndexerConverter x:Key="InderxerConverter"/>
         <local:DefinitionsViewSelector x:Key="DefinitionsViewSelector"/>
+        <local:OutcomeTypeConverter x:Key="OutcomeTypeConverter"/>
+        <local:OutcomeReplacementTemplateSelector x:Key="OutcomeReplacementSelector"/>
         <local:OptionsViewSelector x:Key="OptionsViewSelector"/>
         
         <ObjectDataProvider 
@@ -77,7 +79,16 @@
         <DataTemplate x:Key="IndexerOption" DataType="IndexerItemView">
             
         </DataTemplate>
-
+        <DataTemplate x:Key="GeneralOutcomeReplacement">
+            <TextBlock DataContext="{Binding Reference}">
+                ◯ <Run Text="{Binding Title, Mode=OneWay}"/>
+            </TextBlock>
+        </DataTemplate>
+        <DataTemplate x:Key="ResultOutcomeReplacement">
+            <TextBlock DataContext="{Binding Reference}">
+                ⬤ <Run Text="{Binding Title, Mode=OneWay}"/>
+            </TextBlock>
+        </DataTemplate>
         <DataTemplate x:Key="SuppliedDefinitionView">
             <Border
                 BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
@@ -87,25 +98,39 @@
                 <Grid Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock
+                        Margin="5"
                         Grid.Row="0"
                         Grid.Column="0">
                         <Run Text="{Binding Key, Mode=OneWay}"/> 
                         (<Run Text="{Binding Value.Name, Mode=OneWay}"/>:<Run Text="{Binding Value.Format, Mode=OneWay}"/>)
                     </TextBlock>
 
+
+                    <ItemsControl
+                        Grid.ColumnSpan="2"
+                        Grid.Row="1"
+                        Margin="5"
+                        HorizontalContentAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        DataContext="{Binding Value}"
+                        ItemTemplateSelector="{DynamicResource OptionsViewSelector}"
+                        ItemsSource="{Binding Options, Converter={StaticResource InderxerConverter}}">
+                    </ItemsControl>
                     <Button
                         Grid.Row="0"
                         Grid.Column="1"
                         HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
                         Click="RemoveItemDefinition_Click"
                         Name="RemoveItemDefinition">
-                        Remove Item
+                        🗑
                     </Button>
 
                 </Grid>
@@ -122,7 +147,6 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -133,26 +157,29 @@
                         Grid.Column="0">
                         <Run Text="{Binding Key, Mode=OneWay}"/>
                     </TextBlock>
-                        <ComboBox 
+                    <StackPanel
+                        Orientation="Horizontal"
                         Grid.Row="0"
-                        Grid.Column="1"
-                        ItemsSource="{Binding Source={StaticResource Library}, Path=TypeProcessors}" 
-                        Margin="5"
-                        SelectedValue="{Binding Value.Processor}"/>
+                        Grid.Column="1">
+                        <ComboBox 
+                            ItemsSource="{Binding Source={StaticResource Library}, Path=TypeProcessors}" 
+                            Margin="5"
+                            SelectedValue="{Binding Value.Processor}"/>
+                        <Button
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Click="RemoveItemDefinition_Click"
+                            Name="RemoveItemDefinition">
+                            🗑
+                        </Button>
+
+                    </StackPanel>
                     <TextBox 
                         Grid.Row="1"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
                         Margin="5"
                         Text="{Binding Value.Value}"></TextBox>
-                    <Button
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        HorizontalAlignment="Right"
-                        Click="RemoveItemDefinition_Click"
-                        Name="RemoveItemDefinition">
-                        Remove Item
-                    </Button>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -166,7 +193,6 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -179,13 +205,31 @@
                         Grid.Column="0">
                         <Run Text="{Binding Key, Mode=OneWay}"/> (<Run Text="{Binding Value.Processor.Name, Mode=OneWay}"/>)
                     </TextBlock>
-                    <ComboBox 
-                        Margin="5"
+                    <StackPanel 
+                        Orientation="Horizontal"
                         Grid.Row="0"
-                        Grid.Column="1"
-                        ItemsSource="{Binding Source={StaticResource Library}, 
-                        Path=TypeProcessors}" 
-                        SelectedValue="{Binding Value.Processor, Mode=TwoWay}"/>
+                        Grid.Column="1">
+                        <ComboBox 
+                            Margin="5"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            ItemsSource="{Binding Source={StaticResource Library}, 
+                            Path=TypeProcessors}" 
+                            SelectedValue="{Binding Value.Processor, Mode=TwoWay}"/>
+                        <Button
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Click="RemoveTableDefinition_Click"
+                            Name="RemoveTableDefinition">
+                            🗑
+                        </Button>
+
+                    </StackPanel>
+
+                    
+
                     <Grid
                         Grid.Row="1"
                         Grid.Column="0"
@@ -214,18 +258,13 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
-                    <Button
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Margin="5"
-                        HorizontalAlignment="Right"
-                        Click="RemoveTableDefinition_Click"
-                        Name="RemoveTableDefinition">
-                        Remove Table
-                    </Button>
+
+                   
                 </Grid>
             </Border>
         </DataTemplate>
+        
+        
         <Style x:Key="TreeViewItemStyle_ExpandAll" TargetType="{x:Type TreeViewItem}">
             <Setter Property="IsExpanded" Value="True"/>
             <Setter Property="Padding" Value="5"/>
@@ -361,19 +400,13 @@
                                 VerticalAlignment="Center"
                                 Visibility="Hidden"
                                 Margin="2,3"
-                                SelectedItem="{Binding OutcomeType ,Mode=OneWay}"
-                                ItemsSource="{Binding ReplaceOrConvertOutcomes}"
+                                SelectedValue="{Binding OutcomeType ,Mode=OneWay}"
+                                SelectedValuePath="Type"
+                                ItemsSource="{Binding ReplaceOrConvertOutcomes, Converter={StaticResource OutcomeTypeConverter}}"
                                 LostFocus="Replacement_LostFocus"
                                 SelectionChanged="Replacement_SelectionChanged"
+                                ItemTemplateSelector="{StaticResource OutcomeReplacementSelector}"
                                 Name="Replacement">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock>
-                                            (<Run Text="{Binding BaseType.Name, Mode=OneWay}"/>)
-                                            <Run Text="{Binding Name, Mode=OneWay}"/>
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
                             </ComboBox>
                         </Grid>
 
@@ -483,26 +516,6 @@
                         Grid.Row="0"
                         Grid.Column="2"
                         x:Name="Tabstrib">
-                        <!--<TabItem
-                            Name="OutcomeEditorTab">
-                            <TabItem.Header>
-                                <TextBlock>
-                                    Outcome <Run Text="{Binding ElementName=OutcomeTree, Path=SelectedValue.Name, Mode=OneWay}"/>
-                                </TextBlock>
-
-                            </TabItem.Header>
-                            <ScrollViewer>
-                                <ItemsControl 
-                                d:ItemsSource="{Binding Source={StaticResource DefaultOptions}, Converter={StaticResource InderxerConverter}}"
-                                    HorizontalContentAlignment="Stretch"
-                                    HorizontalAlignment="Stretch"
-                                    ItemsSource="{Binding ElementName=OutcomeTree, Path=SelectedValue.Options, Converter={StaticResource InderxerConverter}}"
-                                    ItemTemplateSelector="{DynamicResource OptionsViewSelector}"
-                                    x:Name="OutcomeOptions">
-                                </ItemsControl>
-                            </ScrollViewer>
-                            
-                        </TabItem>-->
                         <TabItem
                             x:Name="DefinitionsEditorTab" Height="25" VerticalAlignment="Top">
                             <TabItem.Header>Defined Items</TabItem.Header>
@@ -601,9 +614,10 @@
                                                         SelectionChanged="FieldTypeEntry_SelectionChanged"
                                                         x:Name="FieldTypeEntry"/>
                                                     <Button 
-                                                        Margin="5"
+                                                        VerticalAlignment="Center"
+                                                        Margin="0,0,5,0"
                                                         Grid.Column="2"
-                                                        Content="Remove" 
+                                                        Content="🗑" 
                                                         Click="RemoveEntry_Click"
                                                         x:Name="RemoveEntry"/>
                                                 </Grid>
