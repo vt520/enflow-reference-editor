@@ -40,7 +40,7 @@ namespace Reference_Enflow_Builder {
                 }
             },
             Default  = (Program)
-                "{\"$type\":\"Program\",\"Title\":\"Program\",\"Definitions\":{},\"Qualifications\":{\"$type\":\"Outcomes.Accept\",\"Title\":\"Accept Submission\"},\"Application\":{\"$type\":\"Application\",\"Fields\":{\"Service Address\":\"Address\",\"Medical Device\":\"Choice\",\"RRP\":\"Choice\",\"Utility\":\"Text\",\"Residence Address\":\"Address\",\"Bill Amount\":\"Number\",\"Bill Type\":\"Text\",\"Service Type\":\"Text\",\"Dwelling\":\"Text\",\"Electric Vehicle\":\"Choice\",\"3CE Enrollment\":\"Choice\",\"Water System\":\"Text\",\"Household Members\":\"Integer\",\"Household Income\":\"Number\",\"Rebate Recived\":\"Choice\",\"LIHEAP Qualified\":\"Choice\",\"Home Ownership Status\":\"Text\",\"Age\":\"Integer\",\"Fixed Income\":\"Choice\"}}}",
+                "{\"$type\":\"Program\",\"Caption\":\"Program\",\"Definitions\":{\"Yes\":{\"$type\":\"Data\",\"Format\":\"Choice\",\"Value\":\"Yes\"},\"No\":{\"$type\":\"Data\",\"Format\":\"Choice\",\"Value\":\"Yes\"}},\"Qualifications\":{\"$type\":\"Conclusions.Drop\",\"Caption\":\"Abort Processing\"},\"Application\":{\"$type\":\"Application\",\"Fields\":{\"Service Address\":\"Address\",\"Medical Device\":\"Choice\",\"RRP\":\"Choice\",\"Utility\":\"Text\",\"Residence Address\":\"Address\",\"Bill Amount\":\"Number\",\"Bill Type\":\"Text\",\"Service Type\":\"Text\",\"Dwelling\":\"Text\",\"Electric Vehicle\":\"Choice\",\"3CE Enrollment\":\"Choice\",\"Water System\":\"Text\",\"Household Members\":\"Integer\",\"Household Income\":\"Number\",\"Rebate Recived\":\"Choice\",\"LIHEAP Qualified\":\"Choice\",\"Home Ownership Status\":\"Text\",\"Age\":\"Integer\",\"Fixed Income\":\"Choice\"}}}",
             Crap = new Program {
                Application = {
                     Fields = {
@@ -74,25 +74,25 @@ namespace Reference_Enflow_Builder {
                 },
 
                 Qualifications = new IsNotEmpty {
-                    Title = "Ensure the Name Section is Completed",
+                    Caption = "Ensure the Name Section is Completed",
                     From = $"{Program.Sections.Input}:Full Name",
                     Yes = new MatchesListItem {
-                        Title = "Check if they are in the service area",
+                        Caption = "Check if they are in the service area",
                         From = $"{Program.Sections.Input}:Address",
                         ComparedTo = $"{Program.Sections.Definition}:Service Locations",
                         Yes = new GreaterThan {
-                            Title = "Test to see if they are under the maximum income",
+                            Caption = "Test to see if they are under the maximum income",
                             From = $"{Program.Sections.Input}:Household Income",
                             ComparedTo = $"{Program.Sections.Definition}:Maximum Income",
                             Yes = new LessThan { // really GTEQ in Disguise
-                                Title = "See if they are exempt because of # of residents",
+                                Caption = "See if they are exempt because of # of residents",
                                 From = $"{Program.Sections.Input}:Household Members",
                                 ComparedTo = $"{Program.Sections.Definition}:Large Household Exemption",
                                 Yes = new Reject(),
                                 No = new Accept()
                             },
                             No = new GreaterThan {
-                                Title = "Test if the application meets mimimum income requirements",
+                                Caption = "Test if the application meets mimimum income requirements",
                                 From = $"{Program.Sections.Input}:Household Income",
                                 ComparedTo = $"{Program.Sections.Definition}:Minimum Income"
                             }

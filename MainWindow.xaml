@@ -37,9 +37,11 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
+                        FontWeight="DemiBold"
                         Grid.Column="0"
+                        VerticalAlignment="Center"
                         Margin="0,0,5,0">
-                        <Run Text="{Binding Property, Mode=OneWay}"/>
+                        <Run Text="{Binding Label, Mode=OneWay}"/>
                     </TextBlock>
 
                     <ComboBox
@@ -66,9 +68,10 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
-                    Grid.Column="0"
-                    Margin="0,0,5,0">
-                    <Run Text="{Binding Property, Mode=OneWay}"/>
+                        Grid.Column="0"
+                        FontWeight="DemiBold"
+                        Margin="0,0,5,0">
+                        <Run Text="{Binding Label, Mode=OneWay}"/>
                     </TextBlock>
                     <TextBox 
                     Grid.Column="1"
@@ -81,12 +84,12 @@
         </DataTemplate>
         <DataTemplate x:Key="GeneralOutcomeReplacement">
             <TextBlock DataContext="{Binding Reference}">
-                ◯ <Run Text="{Binding Title, Mode=OneWay}"/>
+                ◯ <Run Text="{Binding Caption, Mode=OneWay}"/>
             </TextBlock>
         </DataTemplate>
         <DataTemplate x:Key="ResultOutcomeReplacement">
             <TextBlock DataContext="{Binding Reference}">
-                ⬤ <Run Text="{Binding Title, Mode=OneWay}"/>
+                ⬤ <Run Text="{Binding Caption, Mode=OneWay}"/>
             </TextBlock>
         </DataTemplate>
         <DataTemplate x:Key="SuppliedDefinitionView">
@@ -104,13 +107,20 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock
+                    <Border
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
+
                         Margin="5"
                         Grid.Row="0"
-                        Grid.Column="0">
-                        <Run Text="{Binding Key, Mode=OneWay}"/> 
-                        (<Run Text="{Binding Value.Name, Mode=OneWay}"/>:<Run Text="{Binding Value.Format, Mode=OneWay}"/>)
-                    </TextBlock>
+                        Grid.Column="0"
+                        VerticalAlignment="Center">
+                        <TextBlock>
+                            <Run FontWeight="Bold" Text="{Binding Key, Mode=OneWay}"/> (<Run Text="{Binding Value.Format, Mode=OneWay}"/>)
+                            <LineBreak/>
+                            <Run FontStyle="Italic" Text="{Binding Value.Name, Mode=OneWay}"/>
+                        </TextBlock>
+                    </Border>
 
 
                     <ItemsControl
@@ -152,32 +162,49 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock
+                    <Grid
                         Grid.Row="0"
-                        Grid.Column="0">
-                        <Run Text="{Binding Key, Mode=OneWay}"/>
-                    </TextBlock>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Grid.Row="0"
-                        Grid.Column="1">
-                        <ComboBox 
-                            ItemsSource="{Binding Source={StaticResource Library}, Path=TypeProcessors}" 
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Grid.Column="0"
                             Margin="5"
-                            SelectedValue="{Binding Value.Processor}"/>
+                            BorderThickness="0,0,0,1"
+                            BorderBrush="{x:Static SystemColors.ActiveBorderBrush}">
+                            <TextBlock
+                            FontWeight="Bold"
+                            VerticalAlignment="Center">
+                            <Run Text="{Binding Key, Mode=OneWay}"/>
+                            </TextBlock>
+
+                        </Border>
                         <Button
+                            Grid.Column="1"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Click="RemoveItemDefinition_Click"
                             Name="RemoveItemDefinition">
                             🗑
                         </Button>
+                    </Grid>
+                   
+                        
 
-                    </StackPanel>
+                    <ComboBox 
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        ItemsSource="{Binding Source={StaticResource Library}, Path=TypeProcessors}" 
+                        DisplayMemberPath="Name"
+                        VerticalAlignment="Center"
+                        SelectedValue="{Binding Value.Processor}"/>
                     <TextBox 
                         Grid.Row="1"
                         Grid.Column="0"
-                        Grid.ColumnSpan="2"
+                        Grid.ColumnSpan="1"
                         Margin="5"
                         Text="{Binding Value.Value}"></TextBox>
                 </Grid>
@@ -199,12 +226,18 @@
                         <ColumnDefinition Width="Auto"/>
 
                     </Grid.ColumnDefinitions>
-                    <TextBlock
+                    <Border
                         Grid.Row="0"
-                        Margin="5"
-                        Grid.Column="0">
-                        <Run Text="{Binding Key, Mode=OneWay}"/> (<Run Text="{Binding Value.Processor.Name, Mode=OneWay}"/>)
-                    </TextBlock>
+                        Margin="5,5,0,5"
+                        Grid.Column="0"
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
+                        VerticalAlignment="Center">
+                        <TextBlock>
+                            <Run FontWeight="Bold" Text="{Binding Key, Mode=OneWay}"/> (<Run Text="{Binding Value.Processor.Name, Mode=OneWay}"/>)
+                        </TextBlock>
+
+                    </Border>
                     <StackPanel 
                         Orientation="Horizontal"
                         Grid.Row="0"
@@ -213,8 +246,8 @@
                             Margin="5"
                             Grid.Row="0"
                             Grid.Column="1"
-                            ItemsSource="{Binding Source={StaticResource Library}, 
-                            Path=TypeProcessors}" 
+                            ItemsSource="{Binding Source={StaticResource Library}, Path=TypeProcessors}" 
+                            DisplayMemberPath="Name"
                             SelectedValue="{Binding Value.Processor, Mode=TwoWay}"/>
                         <Button
                             Grid.Row="2"
@@ -306,6 +339,7 @@
                                     VerticalAlignment="Top"
                                     RenderTransformOrigin="0.5,0.5"
                                     Margin="2"
+                                    FontWeight="Bold"
                                     x:Name="Label">
                                     <TextBlock.LayoutTransform>
                                         <RotateTransform Angle="-90"/>
@@ -389,8 +423,11 @@
                                 Click="Title_Click"
                                 x:Name="Title">
                                 <TextBlock
-                                    TextWrapping="Wrap">
-                                    <Run Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"/>
+                                    FontStyle="Italic"
+                                    FontSize="14"
+                                    TextWrapping="Wrap"
+                                    Name="TitleText">
+                                    <Run Text="{Binding Caption, UpdateSourceTrigger=PropertyChanged}"/>
                                 </TextBlock>
                             </Button>
                             <ComboBox
@@ -444,8 +481,11 @@
                                     <Condition Property="IsSelected" Value="true"/>
                                     <Condition Property="IsSelectionActive" Value="false"/>
                                 </MultiTrigger.Conditions>
+                                <Setter Property="Foreground" TargetName="TitleText" Value="{x:Static SystemColors.HighlightTextBrush}"/>
+
                                 <Setter Property="Background" TargetName="SelectionIndicator" Value="{x:Static SystemColors.GrayTextBrush}"/>
-                                <Setter Property="Foreground" TargetName="Label" Value="{x:Static SystemColors.ControlTextBrush}"/>
+                                <Setter Property="Foreground" TargetName="Label" Value="{x:Static SystemColors.HighlightTextBrush}"/>
+                                
                                 <Setter Property="Foreground" TargetName="VisIndicator" Value="{x:Static SystemColors.ControlTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="HidIndicator" Value="{x:Static SystemColors.ControlTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="Title" Value="{x:Static SystemColors.ControlTextBrush}"/>
@@ -604,6 +644,8 @@
                                                     <TextBlock 
                                                         Grid.Column="0"
                                                         Margin="5"
+                                                        VerticalAlignment="Center"
+                                                        FontWeight="Bold"
                                                         Text="{Binding Key, Mode=OneWay}" 
                                                         x:Name="FieldNameEntry"/>
                                                     <ComboBox 
@@ -699,17 +741,21 @@
                                     <DataTemplate>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="150"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <TextBlock
                                                 Grid.Column="0"
                                                 Margin="5">
-                                                <Run Text="{Binding Name}"/>
+                                                <Run FontWeight="Bold" Text="{Binding Name}"/>
+                                                <LineBreak/>
+                                                <Run FontStyle="Italic" Text="{Binding Format}"/>
                                             </TextBlock>
                                             <TextBox 
                                                 Grid.Column="1"
                                                 Margin="5"
+                                                VerticalAlignment="Top"
+                                                AcceptsReturn="True"
                                                 Text="{Binding Value}"/>
                                             <Border
                                                 Grid.Column="0"

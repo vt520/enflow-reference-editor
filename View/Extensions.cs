@@ -21,6 +21,7 @@ namespace Reference_Enflow_Builder.View {
                 source.OnPropertyChanged(property.Name);
             }
         }
+        
         public static List<PropertyInfo> GetDependentProperties(this INotifyPropertyChanged source, string propertyName) {
             List<PropertyInfo> list = new List<PropertyInfo>(
                source.GetType().GetRuntimeProperties().Where(

@@ -120,6 +120,7 @@ namespace Reference_Enflow_Builder.View {
         private void PropertyIndexer_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
             OnPropertyChanged(e.PropertyName);
         }
+        
     }
 
     public class SuggestableIndexerItemView<T> : IndexerItemView<T> {
@@ -140,6 +141,11 @@ namespace Reference_Enflow_Builder.View {
         private string key;
         public string Property {
             get => key;
+        }
+        public string? Label {
+            get {
+                return PropertyIndexer.LabelFor(key);
+            }
         }
         public T? Value {
             get => PropertyIndexer[Property];

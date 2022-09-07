@@ -16,7 +16,7 @@ namespace Reference_Enflow_Builder {
                     results.Add(new OutcomeTypeWrapper(type));
                 }
             }
-            results.Sort((left, right) => left.Reference.Title.CompareTo(right.Reference.Title));
+            results.Sort((left, right) => left.Reference.Caption.CompareTo(right.Reference.Caption));
             return results;
         }
 
