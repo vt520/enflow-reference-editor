@@ -231,7 +231,7 @@ namespace Reference_Enflow_Builder {
         private void TestInput_Click(object sender, RoutedEventArgs e) {
             Dictionary<string, string?>? input_data  = ProgramModel.Input?.InputDictionary;
             Program program = ProgramModel.Program;
-            Result? result = program.Process(input_data) as Result;
+            ProcessResult? result = program.ProcessResult(input_data) as ProcessResult;
             ProcessResult.Text = (string)result;
             ProcessResultText.Text = (string)result;
         }
@@ -281,7 +281,7 @@ namespace Reference_Enflow_Builder {
 
         private void ProcessOutcome_Click(object sender, RoutedEventArgs e) {
             try {
-                Result result = (Result)ProcessResultText.Text;
+                ProcessResult result = (ProcessResult)ProcessResultText.Text;
                 if(result.IsValid && result.IsSealed) {
                     ResultMachineState.Text = result.Complete();
                 } else {
@@ -343,7 +343,7 @@ namespace Reference_Enflow_Builder {
         private void Replacement_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 
             if(sender is ComboBox combo) {
-                if(combo.DataContext is Outcome current) {
+                if(combo.DataContext is Process current) {
                     if (combo.SelectedValue is Type selected_type) {
                         Type current_type = current.GetType();
                         if (current_type == selected_type) return;
@@ -354,7 +354,7 @@ namespace Reference_Enflow_Builder {
                                 return;
                             }
                         }
-                        if (Activator.CreateInstance(selected_type) is Outcome replacement_outcome) {
+                        if (Activator.CreateInstance(selected_type) is Process replacement_outcome) {
                             current.ReplaceWith(replacement_outcome);
                             if(replacement_outcome.IsRoot) {
                                 OutcomeTree.GetBindingExpression(TreeViewItem.ItemsSourceProperty).UpdateTarget();

@@ -49,7 +49,7 @@ namespace Reference_Enflow_Builder.View {
         }
 
         [DerivedFromProperty(nameof(Program))]
-        public Outcome Qualifications {
+        public Process Qualifications {
             get => Program.Qualifications;
             set {
 

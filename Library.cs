@@ -14,8 +14,8 @@ namespace Reference_Enflow_Builder {
     public class Library : Model {
         public static Library Instances { get; } = new Library();
 
-        private Outcome? _SelectedOutcome = null;
-        public Outcome? ReplacementOutcome {
+        private Process? _SelectedOutcome = null;
+        public Process? ReplacementOutcome {
             get {
                 return _SelectedOutcome;
             }
@@ -40,7 +40,7 @@ namespace Reference_Enflow_Builder {
                 }
             },
             Default  = (Program)
-                "{\"$type\":\"Program\",\"Title\":\"Program\",\"Definitions\":{},\"Qualifications\":{\"$type\":\"Outcomes.Accept\",\"Title\":\"Accept Submission\"},\"Application\":{\"$type\":\"Application\",\"Fields\":{\"Service Address\":\"Address\",\"Medical Device\":\"Boolean\",\"RRP\":\"Boolean\",\"Utility\":\"String\",\"Residence Address\":\"Address\",\"Bill Amount\":\"Float\",\"Bill Type\":\"String\",\"Service Type\":\"String\",\"Dwelling\":\"String\",\"Electric Vehicle\":\"Boolean\",\"3CE Enrollment\":\"Boolean\",\"Water System\":\"String\",\"Household Members\":\"Integer\",\"Household Income\":\"Float\",\"Rebate Recived\":\"Boolean\",\"LIHEAP Qualified\":\"Boolean\",\"Home Ownership Status\":\"String\",\"Age\":\"Integer\",\"Fixed Income\":\"Boolean\"}}}",
+                "{\"$type\":\"Program\",\"Title\":\"Program\",\"Definitions\":{},\"Qualifications\":{\"$type\":\"Outcomes.Accept\",\"Title\":\"Accept Submission\"},\"Application\":{\"$type\":\"Application\",\"Fields\":{\"Service Address\":\"Address\",\"Medical Device\":\"Choice\",\"RRP\":\"Choice\",\"Utility\":\"Text\",\"Residence Address\":\"Address\",\"Bill Amount\":\"Number\",\"Bill Type\":\"Text\",\"Service Type\":\"Text\",\"Dwelling\":\"Text\",\"Electric Vehicle\":\"Choice\",\"3CE Enrollment\":\"Choice\",\"Water System\":\"Text\",\"Household Members\":\"Integer\",\"Household Income\":\"Number\",\"Rebate Recived\":\"Choice\",\"LIHEAP Qualified\":\"Choice\",\"Home Ownership Status\":\"Text\",\"Age\":\"Integer\",\"Fixed Income\":\"Choice\"}}}",
             Crap = new Program {
                Application = {
                     Fields = {
@@ -101,7 +101,7 @@ namespace Reference_Enflow_Builder {
                 }
             }
         };
-        public Outcome DefaultOutcome { get => new GreaterThan(); }
+        public Process DefaultOutcome { get => new GreaterThan(); }
         public static ProgramModel DefaultProgramModel { get; } = new ProgramModel { Program = Programs.Default.Clone() };
         public static dynamic Defaults { get; } = new {
             ProgramModel = new ProgramModel { Program = Programs.Default }

@@ -28,11 +28,11 @@ namespace Reference_Enflow_Builder {
         
         public OutcomeTypeWrapper(Type type) {
             Type = type;
-            Reference = Activator.CreateInstance(type) as Outcome;
+            Reference = Activator.CreateInstance(type) as Process;
         }
 
         public Type Type { get; private set; }
-        public Outcome? Reference { get; private set; }
+        public Process? Reference { get; private set; }
 
     }
 }
