@@ -39,8 +39,9 @@ namespace Reference_Enflow_Builder {
                     }}
                 }
             },
-
-            Default = new Program {
+            Default  = (Program)
+                "{\"$type\":\"Program\",\"Title\":\"Program\",\"Definitions\":{},\"Qualifications\":{\"$type\":\"Outcomes.Accept\",\"Title\":\"Accept Submission\"},\"Application\":{\"$type\":\"Application\",\"Fields\":{\"Service Address\":\"Address\",\"Medical Device\":\"Boolean\",\"RRP\":\"Boolean\",\"Utility\":\"String\",\"Residence Address\":\"Address\",\"Bill Amount\":\"Float\",\"Bill Type\":\"String\",\"Service Type\":\"String\",\"Dwelling\":\"String\",\"Electric Vehicle\":\"Boolean\",\"3CE Enrollment\":\"Boolean\",\"Water System\":\"String\",\"Household Members\":\"Integer\",\"Household Income\":\"Float\",\"Rebate Recived\":\"Boolean\",\"LIHEAP Qualified\":\"Boolean\",\"Home Ownership Status\":\"String\",\"Age\":\"Integer\",\"Fixed Income\":\"Boolean\"}}}",
+            Crap = new Program {
                Application = {
                     Fields = {
                         { "Full Name", "String" },
