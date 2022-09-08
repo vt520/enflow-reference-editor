@@ -8,7 +8,7 @@
         xmlns:enflow="clr-namespace:Enflow.Engine;assembly=enflow"
         xmlns:enflow_dec="clr-namespace:Enflow.Decisions;assembly=enflow"
         mc:Ignorable="d"
-        Title="EnFlow Reference Studio" Height="600" Width="800"
+        Title="enƒlow Reference Studio" Height="600" Width="800"
         DataContext="{Binding Source={StaticResource Library}, Path=DefaultProgramModel}">
     <Window.Resources>
         <local:EntriesConverter x:Key="EntriesConverter"/>
@@ -17,7 +17,7 @@
         <local:OutcomeTypeConverter x:Key="OutcomeTypeConverter"/>
         <local:OutcomeReplacementTemplateSelector x:Key="OutcomeReplacementSelector"/>
         <local:OptionsViewSelector x:Key="OptionsViewSelector"/>
-        
+
         <ObjectDataProvider 
             ObjectInstance="{x:Static local:Library.DefaultOptions}"
             x:Key="DefaultOptions"/>
@@ -80,7 +80,7 @@
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="IndexerOption" DataType="IndexerItemView">
-            
+
         </DataTemplate>
         <DataTemplate x:Key="GeneralOutcomeReplacement">
             <TextBlock DataContext="{Binding Reference}">
@@ -191,8 +191,8 @@
                             🗑
                         </Button>
                     </Grid>
-                   
-                        
+
+
 
                     <ComboBox 
                         Grid.Row="1"
@@ -261,7 +261,7 @@
 
                     </StackPanel>
 
-                    
+
 
                     <Grid
                         Grid.Row="1"
@@ -292,12 +292,12 @@
                         </DataGrid>
                     </Grid>
 
-                   
+
                 </Grid>
             </Border>
         </DataTemplate>
-        
-        
+
+
         <Style x:Key="TreeViewItemStyle_ExpandAll" TargetType="{x:Type TreeViewItem}">
             <Setter Property="IsExpanded" Value="True"/>
             <Setter Property="Padding" Value="5"/>
@@ -407,7 +407,7 @@
                                             </Border>
                                             <ItemsPresenter x:Name="ItemsHost" />
                                         </StackPanel>
-                                        
+
                                     </Border>
                                 </Grid>
 
@@ -460,7 +460,7 @@
                                 <Setter Property="Visibility" TargetName="VisIndicator" Value="Visible"/>
                                 <Setter Property="Visibility" TargetName="HidIndicator" Value="Collapsed"/>
                             </Trigger>
-                            
+
                             <Trigger Property="IsSelected" Value="true">
                                 <Setter Property="Background" TargetName="SelectionIndicator" Value="{x:Static SystemColors.HighlightBrush}"/>
                                 <Setter Property="Foreground" TargetName="Label" Value="{x:Static SystemColors.HighlightTextBrush}"/>
@@ -485,7 +485,7 @@
 
                                 <Setter Property="Background" TargetName="SelectionIndicator" Value="{x:Static SystemColors.GrayTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="Label" Value="{x:Static SystemColors.HighlightTextBrush}"/>
-                                
+
                                 <Setter Property="Foreground" TargetName="VisIndicator" Value="{x:Static SystemColors.ControlTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="HidIndicator" Value="{x:Static SystemColors.ControlTextBrush}"/>
                                 <Setter Property="Foreground" TargetName="Title" Value="{x:Static SystemColors.ControlTextBrush}"/>
@@ -504,18 +504,21 @@
             <TabItem
                 Header="Process Designer"
                 Name="DesignerTab">
-                <Grid>
+                <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
+                    
                     <Grid
                         Grid.Column="0"
-                        Grid.Row="0">
+                        Grid.Row="0"
+                        Margin="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -529,12 +532,15 @@
                             </TextBlock>
                         </Border>
                         <TreeView 
-                            Grid.Row="1" ItemsSource="{Binding Program.Outcomes.Values}" 
+                            Grid.Row="1" 
+                            ItemsSource="{Binding Program.Outcomes.Values}" 
                             ItemContainerStyle="{StaticResource TreeViewItemStyle_ExpandAll}"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                             SelectedItemChanged="OutcomeTree_SelectedItemChanged"
-                            HorizontalContentAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
                             Loaded="OutcomeTree_Loaded"
+                            BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
+                            BorderThickness="1"
                             Name="OutcomeTree" >
                             <TreeView.ItemTemplate>
                                 <HierarchicalDataTemplate ItemsSource="{Binding Outcomes.Values}">
@@ -551,9 +557,13 @@
                             </Grid.ColumnDefinitions>
                         </Grid>
                     </Grid>
-                    <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch"/>
+                    
+                    <GridSplitter 
+                        Grid.Column="1" 
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
                     <TabControl
-                        Grid.Row="0"
+                        Margin="5"
                         Grid.Column="2"
                         x:Name="Tabstrib">
                         <TabItem
@@ -590,6 +600,7 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBox
                                         Margin="5"
+                                        VerticalAlignment="Center"
                                         Grid.Column="0"
                                         TextChanged="DefinitionName_TextChanged"
                                         
@@ -604,6 +615,7 @@
                                         Loaded="DataTypeSelector_Loaded"
                                         x:Name="DataTypeSelector"/>
                                     <Button
+                                        Padding="5"
                                         Margin="5"
                                         Grid.Column="2"
                                         Content="Add Item"
@@ -677,6 +689,7 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBox
                                         Margin="5"
+                                        VerticalAlignment="Center"
                                         Grid.Column="0"
                                         TextChanged="NewFieldNameEntry_TextChanged"
                                         x:Name="NewFieldNameEntry"/>
@@ -691,6 +704,7 @@
                                     <Button
                                         Grid.Column="2"
                                         Content="Add Field"
+                                        Padding="5"
                                         Margin="5"
                                         Click="AddToList_Click"
                                         IsEnabled="False"
@@ -707,6 +721,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -714,7 +729,8 @@
                     </Grid.RowDefinitions>
                     <Grid
                         Grid.Row="0"
-                        Grid.Column="0">
+                        Grid.Column="0"
+                        Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
@@ -730,69 +746,85 @@
                             <TextBlock>Application Data</TextBlock>
                         </Border>
 
-                        <Grid
+                        <Border
                             Grid.Row="1"
                             Grid.Column="0"
+                            BorderThickness="1"
+                            BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
                             Name="InputEditingArea">
-                            <ItemsControl
-                                HorizontalContentAlignment="Stretch"
-                                ItemsSource="{Binding Input.Items}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="150"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                Grid.Column="0"
-                                                Margin="5">
-                                                <Run FontWeight="Bold" Text="{Binding Name}"/>
-                                                <LineBreak/>
-                                                <Run FontStyle="Italic" Text="{Binding Format}"/>
-                                            </TextBlock>
-                                            <TextBox 
-                                                Grid.Column="1"
-                                                Margin="5"
-                                                VerticalAlignment="Top"
-                                                AcceptsReturn="True"
-                                                Text="{Binding Value}"/>
-                                            <Border
-                                                Grid.Column="0"
-                                                Grid.ColumnSpan="2"
-                                                BorderBrush="{x:Static SystemColors.InactiveBorderBrush}"
-                                                BorderThickness="0,0,0,1"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl> 
-                        </Grid>
+                                <ScrollViewer 
+                                    HorizontalScrollBarVisibility="Disabled">
 
+                                <ItemsControl
+                                    HorizontalContentAlignment="Stretch"
+                                    ItemsSource="{Binding Input.Items}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="150"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    Margin="5">
+                                                    <Run FontWeight="Bold" Text="{Binding Name}"/>
+                                                    <LineBreak/>
+                                                    <Run FontStyle="Italic" Text="{Binding Format}"/>
+                                                </TextBlock>
+                                                <TextBox 
+                                                    Grid.Column="1"
+                                                    Margin="5"
+                                                    VerticalAlignment="Top"
+                                                    AcceptsReturn="True"
+                                                    Text="{Binding Value}"/>
+                                                <Border
+                                                    Grid.Column="0"
+                                                    Grid.ColumnSpan="2"
+                                                    BorderBrush="{x:Static SystemColors.InactiveBorderBrush}"
+                                                    BorderThickness="0,0,0,1"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                        </Border>
                         <StackPanel 
                             Grid.Row="2"
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
                             <Button 
                                 Margin="5"
+                                Padding="5"
                                 Content="Reset Application"
                                 Click="ResetInput_Click"
                                 Name="ResetInput"/>
                             <Button 
                                 Margin="5"
+                                Padding="5"
                                 Content="Submit"
                                 Click="TestInput_Click"
                                 Name="TestInput"/>
                         </StackPanel>
                     </Grid>
+                    <GridSplitter 
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        />
                     <Grid
                         Grid.Row="0"
-                        Grid.Column="1">
+                        Grid.Column="2"
+                        Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="100*"/>
+                            <RowDefinition Height="429*"/>
                         </Grid.RowDefinitions>
                         <TextBlock
                                 Grid.Row="0"
@@ -805,12 +837,10 @@
                             Grid.Column="0"
                             IsReadOnly="False"
                             AcceptsReturn="True"
-                            VerticalAlignment="Stretch"
                             ScrollViewer.VerticalScrollBarVisibility="Auto"
                             HorizontalScrollBarVisibility="Disabled"
                             TextWrapping="Wrap"
-                            Name="ProcessResult">
-                        </TextBox>
+                            Name="ProcessResult" Grid.RowSpan="2"/>
                     </Grid>
                 </Grid>
             </TabItem>
@@ -820,6 +850,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -829,10 +860,12 @@
                     </Grid.RowDefinitions>
                     <TextBlock
                         Grid.Row="0"
-                        Grid.Column="0">
+                        Grid.Column="0"
+                        Margin="5,0">
                         Process Result Code
                     </TextBlock>
                     <TextBox
+                        Margin="5"
                         Grid.Row="1"
                         Grid.Column="0"
                         AcceptsReturn="True"
@@ -844,6 +877,7 @@
                         HorizontalAlignment="Right">
                         <Button 
                             Margin="5"
+                            Padding="5"
                             Content="Complete Outcome"
                             Click="ProcessOutcome_Click"
                             Name="ProcessOutcome"/>
@@ -855,21 +889,32 @@
                         HorizontalAlignment="Right">
                         <Button 
                             Margin="5"
+                            Padding="5"
                             Content="Complete Response"
                             Click="CompleteResponse_Click"
                             Name="CompleteResponse"/>
                     </StackPanel>
 
                     <TextBlock
+                        Margin="5,0"
                         Grid.Row="0"
-                        Grid.Column="1">
+                        Grid.Column="2">
                         Completion Response
                     </TextBlock>
                     <TextBox
+                        Margin="5"
+                        IsReadOnly="True"
                         Grid.Row="1"
-                        Grid.Column="1"
+                        Grid.Column="2"
                         AcceptsReturn="True"
                         Name="ResultMachineState"/>
+                    <GridSplitter
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Grid.RowSpan="3"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        />
                 </Grid>
             </TabItem>
             <TabItem>
@@ -882,8 +927,9 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBox 
-                        Text="Select 'Serialize Program' to view program source"
+                        Text="Select 'Get Source' to view program source"
                         Grid.Row="0"
+                        Margin="5"
                         AcceptsReturn="True" 
                         ScrollViewer.CanContentScroll="True"
                         VerticalScrollBarVisibility="Auto"
@@ -894,16 +940,18 @@
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
                         <Button
+                            Padding="5"
                             Click="RefreshSource_Click"
                             Margin="5"
                             x:Name="RefreshSource">
-                            Serialize Program
+                            Get Source 📦
                         </Button>
                         <Button
+                            Padding="5"
                             Click="CompileSource_Click"
                             Margin="5"
                             x:Name="CompileSource">
-                            Compile Program
+                            Compile Source ⚙
                         </Button>
                     </StackPanel>
 
