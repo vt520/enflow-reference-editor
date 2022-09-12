@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reference Enflow Builder", "Reference Enflow Builder.csproj", "{97D8B084-B012-4E30-9F8B-518F7BFE4B01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Builder", "Builder.csproj", "{97D8B084-B012-4E30-9F8B-518F7BFE4B01}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "enflow", "..\enflow\enflow.csproj", "{CC09BD19-5330-4320-AA9C-21DABD07886C}"
 EndProject
