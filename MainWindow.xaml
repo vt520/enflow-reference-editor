@@ -17,6 +17,8 @@
         <local:OutcomeTypeConverter x:Key="OutcomeTypeConverter"/>
         <local:OutcomeReplacementTemplateSelector x:Key="OutcomeReplacementSelector"/>
         <local:OptionsViewSelector x:Key="OptionsViewSelector"/>
+        <local:DefinitionTypeSelector x:Key="DefinitionTypeSelector"/>
+        <local:InputTypeSelector x:Key="InputTypeSelector"/>
 
         <ObjectDataProvider 
             ObjectInstance="{x:Static local:Library.DefaultOptions}"
@@ -92,6 +94,7 @@
                 ⬤ <Run Text="{Binding Caption, Mode=OneWay}"/>
             </TextBlock>
         </DataTemplate>
+
         <DataTemplate x:Key="SuppliedDefinitionView">
             <Border
                 BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
@@ -110,7 +113,6 @@
                     <Border
                         BorderThickness="0,0,0,1"
                         BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
-
                         Margin="5"
                         Grid.Row="0"
                         Grid.Column="0"
@@ -121,8 +123,6 @@
                             <Run FontStyle="Italic" Text="{Binding Value.Name, Mode=OneWay}"/>
                         </TextBlock>
                     </Border>
-
-
                     <ItemsControl
                         Grid.ColumnSpan="2"
                         Grid.Row="1"
@@ -180,7 +180,6 @@
                             VerticalAlignment="Center">
                             <Run Text="{Binding Key, Mode=OneWay}"/>
                             </TextBlock>
-
                         </Border>
                         <Button
                             Grid.Column="1"
@@ -191,22 +190,30 @@
                             🗑
                         </Button>
                     </Grid>
-
-
-
-                    <ComboBox 
+                    <!--<ComboBox 
                         Grid.Row="1"
                         Grid.Column="1"
                         ItemsSource="{Binding Source={StaticResource Library}, Path=TypeProcessors}" 
                         DisplayMemberPath="Name"
                         VerticalAlignment="Center"
-                        SelectedValue="{Binding Value.Processor}"/>
+                        SelectedValue="{Binding Value.Processor}"/>-->
                     <TextBox 
                         Grid.Row="1"
                         Grid.Column="0"
                         Grid.ColumnSpan="1"
-                        Margin="5"
+                        VerticalAlignment="Center"
                         Text="{Binding Value.Value}"></TextBox>
+                    <Button
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Padding="2"
+                        Margin="5"
+                        Name="DefinitionTypeButton" 
+                        VerticalAlignment="Center"
+                        ContextMenu="{DynamicResource DefinitionTypeMenu}"
+                        Click="TypeSelector_Click">
+                        <TextBlock FontWeight="DemiBold" Text="{Binding Value.Format}"/>
+                    </Button>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -242,13 +249,24 @@
                         Orientation="Horizontal"
                         Grid.Row="0"
                         Grid.Column="1">
-                        <ComboBox 
+                        <!--<ComboBox 
                             Margin="5"
                             Grid.Row="0"
                             Grid.Column="1"
                             ItemsSource="{Binding Source={StaticResource Library}, Path=TypeProcessors}" 
                             DisplayMemberPath="Name"
-                            SelectedValue="{Binding Value.Processor, Mode=TwoWay}"/>
+                            SelectedValue="{Binding Value.Processor, Mode=TwoWay}"/>-->
+                        <Button
+                            Grid.Column="1"
+                            Grid.Row="0"
+                            Padding="2"
+                            Margin="5"
+                            Name="DefinitionTypeButton" 
+                            VerticalAlignment="Center"
+                            ContextMenu="{DynamicResource DefinitionTypeMenu}"
+                            Click="TypeSelector_Click">
+                            <TextBlock FontWeight="DemiBold" Text="{Binding Value.Format}"/>
+                        </Button>
                         <Button
                             Grid.Row="2"
                             Grid.Column="1"
@@ -258,11 +276,7 @@
                             Name="RemoveTableDefinition">
                             🗑
                         </Button>
-
                     </StackPanel>
-
-
-
                     <Grid
                         Grid.Row="1"
                         Grid.Column="0"
@@ -422,6 +436,7 @@
                                 Background="Transparent"
                                 Click="Title_Click"
                                 x:Name="Title">
+                                
                                 <TextBlock
                                     FontStyle="Italic"
                                     FontSize="14"
@@ -498,9 +513,96 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+
+        <ContextMenu
+            Height="Auto" 
+            ItemsSource="{DynamicResource DefinitionTypeSelector}"
+            x:Shared ="True"
+            Opened="ContextMenu_Opened"
+            x:Key="DefinitionTypeMenu">
+            <ContextMenu.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Command" Value="{Binding Command}"/>
+                    <Setter Property="Header" Value="{Binding Title}"/>
+                    <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                    <Setter Property="ItemsSource" Value="{Binding Children}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Separator Style="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContextMenu.Resources>
+        </ContextMenu>
+        <ContextMenu
+            Height="Auto" 
+            ItemsSource="{DynamicResource InputTypeSelector}"
+            x:Shared ="True"
+            Opened="ContextMenu_Opened"
+            x:Key="InputTypeMenu">
+            <ContextMenu.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Command" Value="{Binding Command}"/>
+                    <Setter Property="Header" Value="{Binding Title}"/>
+                    <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                    <Setter Property="ItemsSource" Value="{Binding Children}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Separator Style="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContextMenu.Resources>
+        </ContextMenu>
+
     </Window.Resources>
+
     <Grid>
-        <TabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!--<Menu Grid.Row="0" 
+            Height="Auto" 
+            ItemsSource="{DynamicResource InputTypeSelector}">
+            <Menu.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Header" Value="{Binding Title}"/>
+                    <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                    <Setter Property="ItemsSource" Value="{Binding Children}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Separator Style="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Menu.Resources>
+
+        </Menu>-->
+
+
+        <TabControl
+            Grid.Row="1">
             <TabItem
                 Header="Process Designer"
                 Name="DesignerTab">
@@ -606,7 +708,8 @@
                                         
                                         x:Name="DefinitionName"/>
 
-                                    <ComboBox 
+                                    <ComboBox
+                                        VerticalAlignment="Center"
                                         Grid.Column="1"
                                         Margin="5"
                                         DisplayMemberPath="Name"
@@ -622,7 +725,6 @@
                                         Click="AddDefinitionObject_Click"
                                         IsEnabled="False"
                                         x:Name="AddDefinitionObject"/>
-
                                 </Grid>
                             </Grid>
                         </TabItem>
@@ -636,7 +738,7 @@
                                 <ScrollViewer
                                      Grid.Row="0">
                                     <ItemsControl 
-                                        ItemsSource="{Binding Application.Fields.Enumerator}"
+                                        ItemsSource="{Binding Application.Fields}"
                                         HorizontalContentAlignment="Stretch"
                                         x:Name="ApplicationFieldsList">
                                         <ItemsControl.ItemTemplate>
@@ -667,6 +769,13 @@
                                                         SelectedValue="{Binding Value, Mode=OneWay}" 
                                                         SelectionChanged="FieldTypeEntry_SelectionChanged"
                                                         x:Name="FieldTypeEntry"/>
+                                                    <Button
+                                                        Margin="5"
+                                                        Grid.Column="1"
+                                                        Click="Button_Click"
+                                                        ContextMenu="{DynamicResource InputTypeMenu}">
+                                                        <TextBlock Text="{Binding Value, Mode=OneWay}"/>
+                                                    </Button>
                                                     <Button 
                                                         VerticalAlignment="Center"
                                                         Margin="0,0,5,0"
@@ -698,7 +807,7 @@
                                         Grid.Column="1"
                                         Margin="5"
                                         ItemsSource="{Binding RegisteredTypeNames, Source={StaticResource FieldCollection}}"
-                                        SelectedValue="String"
+                                        SelectedValue="Text"
                                         x:Name="NewFieldTypeEntry"/>
 
                                     <Button

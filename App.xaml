@@ -4,11 +4,11 @@
              xmlns:local="clr-namespace:Reference_Enflow_Builder"
              xmlns:enflow="clr-namespace:Enflow;assembly=enflow"
              xmlns:enflow_engine="clr-namespace:Enflow.Engine;assembly=enflow"
+             xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <local:MainWindow x:Key="MainWindow"/>
         <local:Library x:Key="Library"/>
-
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="FontSize" Value="16"/>

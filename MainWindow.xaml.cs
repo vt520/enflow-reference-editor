@@ -23,14 +23,26 @@ namespace Reference_Enflow_Builder {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
-        public ProgramModel ProgramModel { get; set; } = new ProgramModel { 
-            Program = Library.Programs.Default.Clone()
-        };
+        private static Program? _Program = null;
+        public static Program Program {
+            get {
+                if (_Program is null) Program = null!;
+                return _Program!;
+            }
+            set {
+                _Program = value;
+                if (_Program is null) _Program = Library.Programs.Default;
+                if(ProgramModel is not null) ProgramModel.Program = _Program ;
+            }
+        }
+        public static ProgramModel ProgramModel {
+            get;
+            set;
+        } = new ProgramModel { Program = MainWindow.Program }; 
         public MainWindow() {
             InitializeComponent();
-
+            Program = Library.Programs.Default;
             DataContext = ProgramModel;
-
         }
 
 
@@ -381,6 +393,51 @@ namespace Reference_Enflow_Builder {
         private void CompleteResponse_Click(object sender, RoutedEventArgs e) {
             ProcessResultText.Text = ResultMachineState.Text;
             ProcessOutcome_Click(sender, e);
+        }
+
+        private void TypeSelector_Click(object sender, RoutedEventArgs e) {
+            if(sender is FrameworkElement element) {
+                
+                if(element.ContextMenu is ContextMenu menu) {
+                    menu.DisplayFor(element);
+                }
+            }
+            //TypeSelector.PlacementTarget = sender as UIElement;
+            //TypeSelector.IsOpen = true;
+            /*button.ContextMenu.PlacementTarget = button;
+button.ContextMenu.IsOpen = true;
+return;
+*/
+        }
+
+        private void ContextMenu_Opened(object sender, RoutedEventArgs e) {
+            if(sender is ContextMenu menu) {
+                if(menu.PlacementTarget is FrameworkElement element) {
+                    foreach(IEnumerable item in menu.Items.OfType<IEnumerable>() ) {
+                        if(item is Model) UpdateCommandTargets(item, element);
+                    }
+                }
+            }
+        }
+        private void UpdateCommandTargets(IEnumerable target, FrameworkElement element) {
+            if (target is null) return;
+            if(target is ICommandable commandable) {
+                if(commandable.Command is ElementCommand<Type> command) {
+                    command.Target = element;
+                }
+                foreach(object item in target) {
+                    if(item is IEnumerable enumerable) UpdateCommandTargets(enumerable, element);
+                }
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e) {
+            if (sender is FrameworkElement element) {
+
+                if (element.ContextMenu is ContextMenu menu) {
+                    menu.DisplayFor(element);
+                }
+            }
         }
     }
 }
