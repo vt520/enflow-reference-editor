@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Windows.UI.Notifications;
 
 namespace Reference_Enflow_Builder {
     internal static class Extensions {

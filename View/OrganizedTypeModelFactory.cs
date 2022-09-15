@@ -1,4 +1,5 @@
-﻿using Enflow.Engine;
+﻿using Enflow;
+using Enflow.Engine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,11 +29,7 @@ namespace Reference_Enflow_Builder.View {
             get {
                 if (Type is null) return null;
                 if (_Title is null) {
-                    if(Type.GetCustomAttribute<DisplayNameAttribute>() is DisplayNameAttribute attribute) {
-                        Title = attribute.DisplayName;
-                    } else {
-                        Title = Type.FullName;
-                    }
+                    Title = Type.GetDisplayName();
                 }
                 return _Title;
             }
@@ -46,11 +43,7 @@ namespace Reference_Enflow_Builder.View {
             get {
                 if (Type is null) return null;
                 if(_Description is null) {
-                    if(Type.GetCustomAttribute<DescriptionAttribute>() is DescriptionAttribute attribute) {
-                        Description = attribute.Description;
-                    } else {
-                        Description = null;
-                    }
+                    Description = Type.GetDescription();
                 }
                 return _Description;
             }

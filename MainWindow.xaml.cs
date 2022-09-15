@@ -43,6 +43,9 @@ namespace Reference_Enflow_Builder {
             InitializeComponent();
             Program = Library.Programs.Default;
             DataContext = ProgramModel;
+            Type foo = typeof(Enflow.Types.Address);
+            _ = foo.GetEnflowType();
+            _ = foo.GetDisplayName();
         }
 
 

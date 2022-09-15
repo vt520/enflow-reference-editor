@@ -1,4 +1,5 @@
-﻿using Enflow.Engine;
+﻿using Enflow;
+using Enflow.Engine;
 using Reference_Enflow_Builder.View;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Reference_Enflow_Builder {
                 _ = button.DataContext;
                 if (button.DataContext is KeyValuePair<string, Enflow.Data> context) {
                     Dispatch = () => {
-                        context.Value.Format = Item!.Name;
+                        context.Value.Format = TypeProcessor.NameFromProcessorType(Item.GetEnflowType());
                     };
                 }
             }

@@ -19,6 +19,7 @@
         <local:OptionsViewSelector x:Key="OptionsViewSelector"/>
         <local:DefinitionTypeSelector x:Key="DefinitionTypeSelector"/>
         <local:InputTypeSelector x:Key="InputTypeSelector"/>
+        <local:TypeNameToDisplayConverter x:Key="TypeNameConverter"/>
 
         <ObjectDataProvider 
             ObjectInstance="{x:Static local:Library.DefaultOptions}"
@@ -104,6 +105,7 @@
                 <Grid Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -113,20 +115,27 @@
                     <Border
                         BorderThickness="0,0,0,1"
                         BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
-                        Margin="5"
+                        Margin="0,5,5,2"
                         Grid.Row="0"
                         Grid.Column="0"
                         VerticalAlignment="Center">
                         <TextBlock>
                             <Run FontWeight="Bold" Text="{Binding Key, Mode=OneWay}"/> (<Run Text="{Binding Value.Format, Mode=OneWay}"/>)
-                            <LineBreak/>
-                            <Run FontStyle="Italic" Text="{Binding Value.Name, Mode=OneWay}"/>
                         </TextBlock>
                     </Border>
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        FontSize="10"
+                        TextAlignment="Center"
+                        Background="LightGray">
+                        <Run FontStyle="Italic" Text="{Binding Value.Name, Mode=OneWay}"/>
+                    </TextBlock>
                     <ItemsControl
                         Grid.ColumnSpan="2"
-                        Grid.Row="1"
-                        Margin="5"
+                        Grid.Row="2"
+                        Margin="0,5,0,0"
                         HorizontalContentAlignment="Stretch"
                         HorizontalAlignment="Stretch"
                         DataContext="{Binding Value}"
@@ -172,13 +181,12 @@
                         </Grid.ColumnDefinitions>
                         <Border
                             Grid.Column="0"
-                            Margin="5"
+                            Margin="0,5,5,5"
                             BorderThickness="0,0,0,1"
                             BorderBrush="{x:Static SystemColors.ActiveBorderBrush}">
                             <TextBlock
-                            FontWeight="Bold"
-                            VerticalAlignment="Center">
-                            <Run Text="{Binding Key, Mode=OneWay}"/>
+                                VerticalAlignment="Center">
+                                <Run FontWeight="Bold" Text="{Binding Key, Mode=OneWay}"/> (<Run Text="{Binding Value.Processor.Name, Mode=OneWay}"/>)
                             </TextBlock>
                         </Border>
                         <Button
@@ -207,12 +215,12 @@
                         Grid.Column="1"
                         Grid.Row="1"
                         Padding="2"
-                        Margin="5"
+                        Margin="5,5,0,5"
                         Name="DefinitionTypeButton" 
                         VerticalAlignment="Center"
                         ContextMenu="{DynamicResource DefinitionTypeMenu}"
                         Click="TypeSelector_Click">
-                        <TextBlock FontWeight="DemiBold" Text="{Binding Value.Format}"/>
+                        <TextBlock FontWeight="DemiBold" Text="{Binding Value.Processor.DisplayName}"/>
                     </Button>
                 </Grid>
             </Border>
@@ -235,7 +243,7 @@
                     </Grid.ColumnDefinitions>
                     <Border
                         Grid.Row="0"
-                        Margin="5,5,0,5"
+                        Margin="0,5,0,5"
                         Grid.Column="0"
                         BorderThickness="0,0,0,1"
                         BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
@@ -265,7 +273,7 @@
                             VerticalAlignment="Center"
                             ContextMenu="{DynamicResource DefinitionTypeMenu}"
                             Click="TypeSelector_Click">
-                            <TextBlock FontWeight="DemiBold" Text="{Binding Value.Format}"/>
+                            <TextBlock FontWeight="DemiBold" Text="{Binding Value.Processor.DisplayName}"/>
                         </Button>
                         <Button
                             Grid.Row="2"
@@ -774,7 +782,7 @@
                                                         Grid.Column="1"
                                                         Click="Button_Click"
                                                         ContextMenu="{DynamicResource InputTypeMenu}">
-                                                        <TextBlock Text="{Binding Value, Mode=OneWay}"/>
+                                                        <TextBlock Text="{Binding Value, Converter={StaticResource TypeNameConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                                                     </Button>
                                                     <Button 
                                                         VerticalAlignment="Center"

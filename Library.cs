@@ -30,11 +30,11 @@ namespace Reference_Enflow_Builder {
         public static dynamic Programs { get; } = new {
             Empty = new Program {
                 Application = {
-                    Fields = {{"name", "String"}}
+                    Fields = {{"name", "Text"}}
                 },
                 Definitions = {
                     {"approved applicants", new Table {
-                        Format = "String",
+                        Format = "Text",
                         Values = { }
                     }}
                 }
@@ -44,9 +44,9 @@ namespace Reference_Enflow_Builder {
             Crap = new Program {
                Application = {
                     Fields = {
-                        { "Full Name", "String" },
+                        { "Full Name", "Text" },
                         { "Address", "Address" },
-                        { "Household Income", "Float" },
+                        { "Household Income", "Number" },
                         { "Household Members", "Integer" }
                     }
                 },
@@ -54,10 +54,10 @@ namespace Reference_Enflow_Builder {
                 Definitions = {
                     { "Fibby", new Fibonacci() },
                     { "Maximum Income", new Data {
-                        Value = "100000.00", Format = "Float"
+                        Value = "100000.00", Format = "Number"
                     }},
                     { "Minimum Income", new Data {
-                        Value = "1.00", Format = "Float"
+                        Value = "1.00", Format = "Number"
                     }},
                     { "Large Household Exemption", new Data {
                         Value = "6", Format = "Integer"

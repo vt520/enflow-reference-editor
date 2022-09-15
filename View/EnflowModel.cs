@@ -121,10 +121,10 @@ namespace Reference_Enflow_Builder.View {
         public List<DataTypeEntry> DataTypes {
             get {
                 if (_DataTypes is not null) return _DataTypes;
-                List < DataTypeEntry > result = new() {
+                List<DataTypeEntry> result = new() {
                     new DataTypeEntry {
                         Type = typeof(Data),
-                        Name = "Data"
+                        Name = (new Data()).Name
                     }
                 };
                 foreach (Type type in Data.Types) {
