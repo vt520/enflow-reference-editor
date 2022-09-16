@@ -6,7 +6,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+
 
 namespace Reference_Enflow_Builder {
     /// <summary>
@@ -42,6 +45,11 @@ namespace Reference_Enflow_Builder {
         public MainWindow() {
             InitializeComponent();
             Program = Library.Programs.Default;
+            _ = Services.Universe.ImplementationsOf(typeof(Program));
+            foreach(PropertyInfo property in Services.Inspector.GetProperties(Program.GetType())) {
+                JsonIgnoreCondition policy = Services.Inspector.GetIgnoreCondition(property);
+            }
+            _ = Program.IsEnflowObject();
             DataContext = ProgramModel;
             Type foo = typeof(Enflow.Types.Address);
             _ = foo.GetEnflowType();
@@ -297,18 +305,17 @@ namespace Reference_Enflow_Builder {
         private void ProcessOutcome_Click(object sender, RoutedEventArgs e) {
             try {
                 ProcessResult result = (ProcessResult)ProcessResultText.Text;
-                if(result.IsValid && result.IsSealed) {
+                if (result.IsValid && result.IsSignatureValid()) {
                     ResultMachineState.Text = result.Complete();
+                } else if(!result.IsValid) {
+                    ResultMachineState.Text = "Object constructed in an invalid manner";
                 } else {
-                    if (result.IsSealed) {
+                    if (result.IsSigned()) {
                         ResultMachineState.Text = "Validation Failed, object signature error";
                     } else {
                         ResultMachineState.Text = "A Valid Seal is Required For Processing";
                     }
-                    
                 }
-                
-
             } catch (Exception ex) {
                 ResultMachineState.Text = ex.ToString();
             }
