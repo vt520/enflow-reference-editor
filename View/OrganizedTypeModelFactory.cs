@@ -68,7 +68,8 @@ namespace Reference_Enflow_Builder.View {
             set {
                 _Type = value;
                 if (value is not null) {
-                    C? command = Activator.CreateInstance(typeof(C), new object[] { value }) as C;
+                    C? command = null;
+                    if(value.IsCreatable()) command = Activator.CreateInstance(typeof(C), new object[] { value }) as C;
                     Command = command;
                 } else {
                     Command = null;
@@ -92,7 +93,8 @@ namespace Reference_Enflow_Builder.View {
                 if (Activator.CreateInstance(typeof(T), new object[] { test_type }) is T new_element) {
                     unorganized_children.Add(test_type, new_element);
                 }
-                Type? parent_type = recurse_to_public ? test_type.GetCreatableBaseType() : test_type.BaseType;
+                //Type? parent_type = recurse_to_public ? test_type.GetCreatableBaseType() : test_type.BaseType;
+                Type parent_type = test_type.GetLogicalParent(recurse_to_public);
                 if (parent_type is null || !parent_type.IsAssignableTo(root_type)) parent_type = root_type;
                 if (parent_type == root_type) continue;
                 if (type_stack.Contains(parent_type) || unorganized_children.ContainsKey(parent_type)) continue;
@@ -101,7 +103,7 @@ namespace Reference_Enflow_Builder.View {
 
             foreach(Type child_type in unorganized_children.Keys) {
                 T? child_element = unorganized_children[child_type];
-                Type? parent_type = recurse_to_public ? child_type.GetCreatableBaseType() : child_type.BaseType;
+                Type? parent_type = child_type.GetLogicalParent(recurse_to_public);//recurse_to_public ? child_type.GetCreatableBaseType() : child_type.BaseType;
 
                 if (parent_type is null || !parent_type.IsAssignableTo(root_type)) parent_type = root_type;
                 T? parent_element = unorganized_children[parent_type];
@@ -188,10 +190,10 @@ namespace Reference_Enflow_Builder.View {
             if(Children.Count > 0) {
                 if (IsRoot) return;
                 if (Self is not null && !Children.Contains(Self)) {
+                    if (Command is null) return;
                     Children.Insert(0, Self);
                     Children.Insert(1, null);
                 }
-
             }
         }
     }

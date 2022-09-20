@@ -12,7 +12,7 @@ namespace Reference_Enflow_Builder {
             get => TypeProcessor.Processors[Type];
         }
         public DefinitionTypeSelector(Type type) : base(type) { }
-        public DefinitionTypeSelector() : base(typeof(TypeProcessor), TypeProcessor.Processors.Keys.ToList(), true) { }
+        public DefinitionTypeSelector() : base(typeof(TypeProcessor), TypeProcessor.Processors.Keys.ToList(), false) { }
     }
     public class ReplaceDefinitionType : ElementCommand<Type> {
         public ReplaceDefinitionType(Type item) : base(item) {

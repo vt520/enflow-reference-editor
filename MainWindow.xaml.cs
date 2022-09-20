@@ -19,6 +19,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static Enflow.Engine.Services;
+using static Enflow.CSD;
 
 
 namespace Reference_Enflow_Builder {
@@ -43,17 +45,16 @@ namespace Reference_Enflow_Builder {
             set;
         } = new ProgramModel { Program = MainWindow.Program }; 
         public MainWindow() {
+            Universe.InitializeDomain(AppDomain.CurrentDomain);
+            
+            //Type foo = typeof(Enflow.Types.Class1);
             InitializeComponent();
+            
             Program = Library.Programs.Default;
-            _ = Services.Universe.ImplementationsOf(typeof(Program));
-            foreach(PropertyInfo property in Services.Inspector.GetProperties(Program.GetType())) {
-                JsonIgnoreCondition policy = Services.Inspector.GetIgnoreCondition(property);
-            }
-            _ = Program.IsEnflowObject();
+
+            string version = $"{Services.Version.Revision} {Services.VersionOf(this).Revision}";
+            //Windows.ApplicationModel.Package.Current.Id.Version;
             DataContext = ProgramModel;
-            Type foo = typeof(Enflow.Types.Address);
-            _ = foo.GetEnflowType();
-            _ = foo.GetDisplayName();
         }
 
 

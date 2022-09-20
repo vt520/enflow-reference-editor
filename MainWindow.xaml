@@ -8,8 +8,11 @@
         xmlns:enflow="clr-namespace:Enflow.Engine;assembly=enflow"
         xmlns:enflow_dec="clr-namespace:Enflow.Decisions;assembly=enflow"
         mc:Ignorable="d"
-        Title="enƒlow Reference Studio" Height="600" Width="800"
+         Height="600" Width="800"
         DataContext="{Binding Source={StaticResource Library}, Path=DefaultProgramModel}">
+    <Window.Title>
+        enƒlow Reference Studio
+    </Window.Title>
     <Window.Resources>
         <local:EntriesConverter x:Key="EntriesConverter"/>
         <local:IndexerConverter x:Key="InderxerConverter"/>
@@ -582,6 +585,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <!--<Menu Grid.Row="0" 
@@ -1080,7 +1084,15 @@
                 </Grid>
             </TabItem>
         </TabControl>
-
+        <Border
+            BorderBrush="{x:Static SystemColors.ActiveCaptionBrush}"
+            Grid.Row="2">
+            <TextBlock
+                Margin="2"
+                TextAlignment="Right">
+                <Run Text="{Binding VersionInfo, Mode=OneWay}"/>
+            </TextBlock>
+        </Border>
         <!-- <local:OutcomeViewer DataContext="{Binding Qualifications}" Grid.Row="1" Grid.Column="1"/> -->
 
     </Grid>

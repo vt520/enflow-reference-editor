@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Windows.UI.Notifications;
+using static Enflow.Engine.Services;
 
 namespace Reference_Enflow_Builder {
     internal static class Extensions {
@@ -28,7 +29,9 @@ namespace Reference_Enflow_Builder {
             }
             return parent_type!;
         }
-
+        public static Type GetLogicalParent(this Type target, bool creatable = true) {
+            return Universe.GetLogicalParent(target, creatable);
+        }
         public static DependencyObject? FindAncestor(this DependencyObject source, Type seach_type) {
             DependencyObject current = source;
             DependencyObject? parent = null;

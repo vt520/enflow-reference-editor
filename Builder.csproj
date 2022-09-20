@@ -9,13 +9,33 @@
     <SupportedOSPlatformVersion>10.0.20348.0</SupportedOSPlatformVersion>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
-
+	<PropertyGroup>
+		<Deterministic>false</Deterministic>
+		<Version>$(VersionPrefix)</Version>
+		<AssemblyVersion>1.0.*</AssemblyVersion>
+	</PropertyGroup>
   <ItemGroup>
     <Content Include="Icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Enflow CSD Extensions\Enflow CSD Extensions.csproj" />
     <ProjectReference Include="..\enflow\enflow.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

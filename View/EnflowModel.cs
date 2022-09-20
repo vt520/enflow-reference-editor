@@ -117,6 +117,14 @@ namespace Reference_Enflow_Builder.View {
             Definitions.CollectionChanged += Definitions_CollectionChanged;
             this.RegisterChangeEventProxy(Qualifications, null, nameof(Qualifications));
         }
+        public string VersionInfo {
+            get {
+                Version app = Services.VersionOf(this);
+                Version sys = Services.Version;
+                return $"Enƒlow: {sys.Major}.{sys.Minor}.{sys.Build}.{sys.Revision}, Host: {app.Build}.{app.Revision}";
+
+            }
+        }
         private List<DataTypeEntry>? _DataTypes = null;
         public List<DataTypeEntry> DataTypes {
             get {
