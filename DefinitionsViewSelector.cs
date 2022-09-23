@@ -1,4 +1,5 @@
 ﻿using Enflow;
+using Enflow.Engine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Reference_Enflow_Builder {
+namespace Reference_Enflow_Builder
+{
     public class DefinitionsViewSelector : DataTemplateSelector {
         public override DataTemplate? SelectTemplate(object item, DependencyObject container) {
             FrameworkElement? element = container as FrameworkElement;

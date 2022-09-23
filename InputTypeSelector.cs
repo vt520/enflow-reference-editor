@@ -13,7 +13,7 @@ namespace Reference_Enflow_Builder {
             get => TypeProcessor.Processors[Type];
         }
         public InputTypeSelector(Type type) : base(type) { }
-        public InputTypeSelector() : base(typeof(TypeProcessor), TypeProcessor.Processors.Keys.ToList(), true) { }
+        public InputTypeSelector() : base(typeof(TypeProcessor), TypeProcessor.Processors.Keys.ToList(), false) { }
     }
     public class ReplaceInputType : ElementCommand<Type> {
         public ReplaceInputType(Type item) : base(item) {
