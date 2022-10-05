@@ -12,6 +12,7 @@ using System.Printing;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -83,7 +84,6 @@ namespace Reference_Enflow_Builder.View {
             if (root_type is null) root_type = typeof(object);
             Type = root_type;
             if (child_types is null) return;
-            
             IsRoot = true;
 
             Dictionary<Type, T> unorganized_children = new() {{ root_type, (T)this}};
@@ -96,7 +96,7 @@ namespace Reference_Enflow_Builder.View {
                 //Type? parent_type = recurse_to_public ? test_type.GetCreatableBaseType() : test_type.BaseType;
                 Type parent_type = test_type.GetLogicalParent(recurse_to_public);
                 if (parent_type is null || !parent_type.IsAssignableTo(root_type)) parent_type = root_type;
-                if (parent_type == root_type) continue;
+                //if (parent_type == root_type) continue;
                 if (type_stack.Contains(parent_type) || unorganized_children.ContainsKey(parent_type)) continue;
                 type_stack.Push(parent_type);
             }
@@ -154,6 +154,12 @@ namespace Reference_Enflow_Builder.View {
             protected set {
                 _IsHeading = value;
                 OnPropertyChanged();
+            }
+        }
+        public Visibility Visibility {
+            get {
+                if (Children.Count() > 0 || Command is not null) return Visibility.Visible;
+                return Visibility.Collapsed;
             }
         }
         private T? _Self = null;

@@ -1,7 +1,8 @@
 ﻿using Enflow;
 using Enflow.Engine;
 
-namespace Reference_Enflow_Builder.View {
+namespace Reference_Enflow_Builder.View
+{
     public class DefinitionsView : ProgramViewModel {
         public ObservableDictionary<string, Data> Entries {
             get => Program.Definitions;

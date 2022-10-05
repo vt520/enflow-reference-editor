@@ -1,4 +1,6 @@
 ﻿using Enflow;
+using Enflow.Engine;
+using Enflow.Types;
 
 namespace Reference_Enflow_Builder.View {
     public class ProgramViewModel : Model {

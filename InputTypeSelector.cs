@@ -26,7 +26,7 @@ namespace Reference_Enflow_Builder {
                     
                     Dispatch = () => {
                         
-                        current_program.Application.Fields[context.Key] = TypeProcessor.NameFromProcessorType(Item.GetEnflowType());
+                        current_program.Application.Fields[context.Key] = TypeProcessor.NameFromProcessorType(Item.EnflowName());
                     };
                 }
             }

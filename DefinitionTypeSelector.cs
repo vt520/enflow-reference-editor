@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 
-namespace Reference_Enflow_Builder {
+namespace Reference_Enflow_Builder
+{
     public class DefinitionTypeSelector : OrganizedTypeModelFactory<DefinitionTypeSelector, ReplaceDefinitionType> {
         public TypeProcessor? Processor {
             get => TypeProcessor.Processors[Type];
@@ -20,9 +21,9 @@ namespace Reference_Enflow_Builder {
         public override void Execute(object? parameter) {
             if (Target is Button button) {
                 _ = button.DataContext;
-                if (button.DataContext is KeyValuePair<string, Enflow.Data> context) {
+                if (button.DataContext is KeyValuePair<string, Data> context) {
                     Dispatch = () => {
-                        context.Value.Format = TypeProcessor.NameFromProcessorType(Item.GetEnflowType());
+                        context.Value.Format = TypeProcessor.NameFromProcessorType(Item.EnflowName());
                     };
                 }
             }

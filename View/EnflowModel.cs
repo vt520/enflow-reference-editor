@@ -1,5 +1,6 @@
 ﻿using Enflow;
 using Enflow.Engine;
+using Enflow.Types;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,7 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reference_Enflow_Builder.View {
+namespace Reference_Enflow_Builder.View
+{
     public class ProgramModel : Model {
         private Program? _Program = null;
         public Program Program {
@@ -50,11 +52,11 @@ namespace Reference_Enflow_Builder.View {
 
         [DerivedFromProperty(nameof(Program))]
         public Process Qualifications {
-            get => Program.Qualifications;
+            get => Program.Process;
             set {
 
                 this.UnregisterChangeEventProxy(Qualifications);
-                Program.Qualifications = value;
+                Program.Process = value;
                 this.RegisterChangeEventProxy(Qualifications);
                 OnPropertyChangedAsync();
             }
@@ -117,12 +119,20 @@ namespace Reference_Enflow_Builder.View {
             Definitions.CollectionChanged += Definitions_CollectionChanged;
             this.RegisterChangeEventProxy(Qualifications, null, nameof(Qualifications));
         }
+        private long _OpTime = 0;
+        public long OpTime { 
+            get => _OpTime; 
+            set {
+                _OpTime = value;
+                OnPropertyChanged();
+            } 
+        }
+        [DerivedFromProperty(nameof(OpTime))]
         public string VersionInfo {
             get {
                 Version app = Services.VersionOf(this);
                 Version sys = Services.Version;
-                return $"Enƒlow: {sys.Major}.{sys.Minor}.{sys.Build}.{sys.Revision}, Host: {app.Build}.{app.Revision}";
-
+                return $"Enƒlow: {sys.Major}.{sys.Minor}.{sys.Build}.{sys.Revision}, Host: {app.Build}.{app.Revision} (Operation time {OpTime}ms)";
             }
         }
         private List<DataTypeEntry>? _DataTypes = null;
@@ -137,8 +147,7 @@ namespace Reference_Enflow_Builder.View {
                 };
                 foreach (Type type in Data.Types) {
                     try {
-
-                        if (Activator.CreateInstance(type) is Data source) {
+                        if (type.IsCreatable() && Activator.CreateInstance(type) is Data source) {
                             result.Add(new DataTypeEntry { Name = source.Name, Type = type });
                         }
                     } catch {
@@ -153,6 +162,9 @@ namespace Reference_Enflow_Builder.View {
                 OnPropertyChangedAsync();
             }
         }
+        public Type DefaultType { get => typeof(Item); }
+        public Type DefaultInputType { get => typeof(Text); }
+
     }
     public class DataTypeEntry {
         public Type Type { get; set; } = typeof(Object);

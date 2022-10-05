@@ -20,10 +20,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static Enflow.Engine.Services;
-using static Enflow.CSD;
+using static Enflow.CSD_Extensions;
+using Enflow.Supplied.Sums;
+using System.Threading;
+using System.Diagnostics;
 
-
-namespace Reference_Enflow_Builder {
+namespace Reference_Enflow_Builder
+{
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -45,14 +48,16 @@ namespace Reference_Enflow_Builder {
             set;
         } = new ProgramModel { Program = MainWindow.Program }; 
         public MainWindow() {
-            Universe.InitializeDomain(AppDomain.CurrentDomain);
-            
+            Stopwatch s = new();
+            s.Start();
+            Universe.InitializeDomain();
+            Program = (Program)@"{""$type"":""Program"",""Caption"":""Program"",""Definitions"":{""Yes"":{""$type"":""Engine.Data"",""Format"":""Choice"",""Value"":""Yes""},""No"":{""$type"":""Engine.Data"",""Format"":""Choice"",""Value"":""No""},""maybe"":{""$type"":""CSD.AddressBuilder"",""Location"":""Input:Address1"",""Detail"":""Input:Address2"",""City"":""Input:CSD City"",""State"":""Input:CSD State"",""Zip"":""Input:Zip""},""Expiration Date"":{""$type"":""Item"",""Format"":""Date""}},""Process"":{""$type"":""Qualifications.Income.Offset.CaliforniaAMI"",""Caption"":""Qualify using Area Median Income Data for California with Offset"",""Rejected"":{""$type"":""Outcomes.Reject"",""Caption"":""Rejected Item""},""Qualified"":{""$type"":""Filters.Dates.Before"",""Caption"":""Filters.Dates.Before"",""Yes"":{""$type"":""Outcomes.Accept"",""Caption"":""Accept Submission""},""Value"":""Definitions:Expiration Date""},""HouseholdMembers"":""Input:Household Members"",""HouseholdIncome"":""Input:Household Income"",""Address"":""Definitions:maybe"",""Multiplier"":""2""},""Application"":{""$type"":""Application"",""Fields"":{""First Name"":""Text"",""Middle Initial"":""CSD.Text.Text1"",""Last Name"":""Text"",""Mailing Address"":""Geographies.Address"",""E-Mail Address"":""CSD.Accounts.Email"",""Household Members"":""Numbers.Count"",""Household Income"":""CSD.Numbers.Currency"",""Service Address"":""Geographies.Address"",""Service Building Type"":""CSD.Codes.Building"",""Utility ID"":""CSD.Codes.Utility"",""Account Number"":""CSD.Accounts.Number"",""Bill Amount"":""CSD.Numbers.Currency"",""Delinquent"":""CSD.Confirmation"",""Home Ownership Status"":""CSD.Confirmation"",""LIHEAP Qualified"":""CSD.Confirmation"",""Rebate Received"":""CSD.Confirmation"",""3CE Enrollment"":""CSD.Confirmation"",""Active Reduced Rate Program"":""CSD.Confirmation"",""Fixed Income"":""CSD.Confirmation"",""Address1"":""CSD.Locations.Address1"",""Address2"":""CSD.Locations.Address2"",""CSD State"":""CSD.Locations.State"",""CSD City"":""CSD.Locations.City"",""Zip"":""Geographies.Zipcode""}}}";
+            s.Stop();
             //Type foo = typeof(Enflow.Types.Class1);
             InitializeComponent();
-            
-            Program = Library.Programs.Default;
 
-            string version = $"{Services.Version.Revision} {Services.VersionOf(this).Revision}";
+            ProgramModel.OpTime = s.ElapsedMilliseconds;
+            //string version = $"{Services.Version.Revision} {Services.VersionOf(this).Revision} (boot time {s.ElapsedMilliseconds}ms)";
             //Windows.ApplicationModel.Package.Current.Id.Version;
             DataContext = ProgramModel;
         }
@@ -175,10 +180,14 @@ namespace Reference_Enflow_Builder {
         }
         private void AddToList_Click(object sender, RoutedEventArgs e) {
             if(sender is Button button && button.DataContext is ProgramModel model) {
-                
-                string entryName = NewFieldNameEntry.Text;
+                Type? entry_type = NewInputType.DataContext as Type;
+                if (entry_type is null) return;
+                string entry_name = NewFieldNameEntry.Text;
+
+                model.Application.Fields.Add(entry_name, entry_type.EnflowName(true));
+/*                string entryName = NewFieldNameEntry.Text;
                 string? entryType = NewFieldTypeEntry.SelectedValue as string;
-                model.Application.Fields.Add(entryName, entryType);
+                model.Application.Fields.Add(entryName, entryType);*/
                 ApplicationFieldsList.GetBindingExpression(ListBox.ItemsSourceProperty).UpdateTarget();
                 ApplicationFieldsList.Items.Refresh();
                 NewFieldNameEntry.Text = "";
@@ -215,7 +224,7 @@ namespace Reference_Enflow_Builder {
         }
 
         private void RemoveTableDefinition_Click(object sender, RoutedEventArgs e) {
-            if (e.OriginalSource is Button button && button.DataContext is KeyValuePair<string, Enflow.Data> data_item) {
+            if (e.OriginalSource is Button button && button.DataContext is KeyValuePair<string, Data> data_item) {
                 ProgramModel.Definitions.Remove(data_item.Key);
             }
 
@@ -253,16 +262,20 @@ namespace Reference_Enflow_Builder {
         }
 
         private void TestInput_Click(object sender, RoutedEventArgs e) {
+            Stopwatch s = new Stopwatch();
+            s.Start();
             Dictionary<string, string?>? input_data  = ProgramModel.Input?.InputDictionary;
             Program program = ProgramModel.Program;
             ProcessResult? result = program.ProcessResult(input_data) as ProcessResult;
             ProcessResult.Text = (string)result;
+            s.Stop();
             ProcessResultText.Text = (string)result;
+            ProgramModel.OpTime = s.ElapsedMilliseconds;
         }
 
         private void AddDefinitionObject_Click(object sender, RoutedEventArgs e) {
-            if(DataTypeSelector.SelectedValue is DataTypeEntry selected_entry) {
-                if(Activator.CreateInstance(selected_entry.Type) is Data new_entry) {
+            if(DefinitionTypeBtn.DataContext is Type selected_entry) {
+                if(Activator.CreateInstance(selected_entry) is Data new_entry) {
                     IEnumerable source = DefinitionList.ItemsSource;
                     //DefinitionList.ItemsSource = null;
                     try {
@@ -273,7 +286,7 @@ namespace Reference_Enflow_Builder {
 
                         ProgramModel.Definitions.Add(DefinitionName.Text, new_entry);
                         DefinitionName.Text = "";
-                    } catch {
+                    } catch (Exception evt) {
 
                     }
 
@@ -295,7 +308,7 @@ namespace Reference_Enflow_Builder {
 
         private void UpdateDefinitionAdderEnabled() {
             bool enabled = (DefinitionName.Text != "") && (!ProgramModel.Definitions.ContainsKey(DefinitionName.Text));
-            AddDefinitionObject.IsEnabled = enabled && DataTypeSelector.SelectedValue is not null;
+            AddDefinitionObject.IsEnabled = enabled ;
         }
         private void DataTypeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             if(sender is ComboBox combobox) {
@@ -332,17 +345,10 @@ namespace Reference_Enflow_Builder {
             }
         }
 
-        private void DataTypeSelector_Loaded(object sender, RoutedEventArgs e) {
-            DataTypeSelector.SelectedIndex = 0;
-        }
 
         private void Title_Click(object sender, RoutedEventArgs e) {
-            if(sender is Button button) {
-                if(button.Parent is Grid grid && grid.FindName("Replacement") is ComboBox combo) {
-                    combo.Visibility = Visibility.Visible;
-                    button.Visibility = Visibility.Hidden;
-                    combo.Focus();
-                }
+            if(sender is Button button && button.ContextMenu is ContextMenu menu) {
+                menu.DisplayFor(button);
             }
         }
 
@@ -362,43 +368,25 @@ namespace Reference_Enflow_Builder {
                 }
             }
         }
-
-        private void Replacement_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-
-            if(sender is ComboBox combo) {
-                if(combo.DataContext is Process current) {
-                    if (combo.SelectedValue is Type selected_type) {
-                        Type current_type = current.GetType();
-                        if (current_type == selected_type) return;
-                        if (!current.CompatibleOutcomes.Contains(selected_type)) {
-                            MessageBoxResult result = MessageBox.Show("Cannot copy child Outcomes to new object, Would you like to proceed?", "Data Loss Warning", MessageBoxButton.YesNo);
-                            if (result == MessageBoxResult.No) {
-                                combo.SelectedValue = current_type;
-                                return;
-                            }
-                        }
-                        if (Activator.CreateInstance(selected_type) is Process replacement_outcome) {
-                            current.ReplaceWith(replacement_outcome);
-                            if(replacement_outcome.IsRoot) {
-                                OutcomeTree.GetBindingExpression(TreeViewItem.ItemsSourceProperty).UpdateTarget();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         private void CompileSource_Click(object sender, RoutedEventArgs e) {
+            Stopwatch s = new();
+            s.Start();
             try {
                 ProgramModel.Program = (Program)Source.Text;
+                s.Stop();
             } catch (Exception ex) {
                 Source.Text = ex.ToString();
             }
-            
+            ProgramModel.OpTime = s.ElapsedMilliseconds;
         }
 
         private void RefreshSource_Click(object sender, RoutedEventArgs e) {
-            Source.Text = ProgramModel.Program;
+            Stopwatch s = new();
+            s.Start();
+            string source = ProgramModel.Program;
+            s.Stop();
+            Source.Text = source;
+            ProgramModel.OpTime = s.ElapsedMilliseconds;
         }
 
         private void CompleteResponse_Click(object sender, RoutedEventArgs e) {
@@ -448,6 +436,12 @@ return;
                 if (element.ContextMenu is ContextMenu menu) {
                     menu.DisplayFor(element);
                 }
+            }
+        }
+
+        private void DefinitionTypeBtn_Click(object sender, RoutedEventArgs e) {
+            if (sender is Button button && button.ContextMenu is ContextMenu menu) {
+                menu.DisplayFor(button);
             }
         }
     }

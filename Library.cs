@@ -1,17 +1,88 @@
 ﻿using Enflow;
+using Enflow.CSD;
 using Enflow.Decisions;
 using Enflow.Engine;
 using Enflow.Outcomes;
 using Enflow.Supplied;
+using Enflow.Types;
+using Enflow.Types.CSD;
+using Enflow.Types.CSD.Accounts;
+using Enflow.Types.CSD.Codes;
+using Enflow.Types.CSD.Numbers;
+using Enflow.Types.CSD.Text;
+using Enflow.Types.Geographies;
+using Enflow.Types.Numbers;
 using Reference_Enflow_Builder.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+/*
+{
+  "$type": "Program",
+  "Caption": "Program",
+  "Definitions": {
+    "Yes": {
+      "$type": "Data",
+      "Format": "Choice",
+      "Value": "Yes"
+    },
+    "No": {
+      "$type": "Data",
+      "Format": "Choice",
+      "Value": "No"
+    }
+  },
+  "Qualifications": {
+    "$type": "Qualifications.Income.Offset.CAAMIOffset",
+    "Caption": "Qualify using Area Median Income Data for California with Offset",
+    "Rejected": {
+      "$type": "Outcomes.Reject",
+      "Caption": "Rejected Item"
+    },
+    "Qualified": {
+      "$type": "Outcomes.AcceptToST",
+      "Caption": "Approve with ServTraq",
+      "SomeProp": "Something"
+    },
+    "HouseholdMembers": "Input:Household Members",
+    "HouseholdIncome": "Input:Household Income",
+    "Address": "Input:Service Address",
+    "Multiplier": "2"
+  },
+  "Application": {
+    "$type": "Application",
+    "Fields": {
+      "First Name": "Text",
+      "Middle Initial": "Text",
+      "Last Name": "Text",
+      "Mailing Address": "Geographies.Address",
+      "E-Mail Address": "CSD.Accounts.Email",
+      "Household Members": "Numbers.Count",
+      "Household Income": "Numbers.Decimal",
+      "Service Address": "Geographies.Address",
+      "Service Building Type": "CSD.Codes.Building",
+      "Utility ID": "CSD.Codes.Utility",
+      "Account Number": "CSD.Accounts.Number",
+      "Bill Amount": "Numbers.Decimal",
+      "Delinquent": "Choice",
+      "Home Ownership Status": "Choice",
+      "LIHEAP Qualified": "Choice",
+      "Rebate Received": "Choice",
+      "3CE Enrollment": "Choice",
+      "Active Reduced Rate Program": "Choice",
+      "Fixed Income": "Choice"
+    }
+  }
+}
+ */
 
 namespace Reference_Enflow_Builder {
     public class Library : Model {
+        public static string Name(System.Type type) {
+            return type.EnflowName(true);
+        }
         public static Library Instances { get; } = new Library();
 
         private Process? _SelectedOutcome = null;
@@ -27,79 +98,64 @@ namespace Reference_Enflow_Builder {
         public List<TypeProcessor> TypeProcessors {
             get => TypeProcessor.Processors.Values.ToList();
         }
-        public static dynamic Programs { get; } = new {
-            Empty = new Program {
-                Application = {
-                    Fields = {{"name", "Text"}}
-                },
-                Definitions = {
-                    {"approved applicants", new Table {
-                        Format = "Text",
-                        Values = { }
-                    }}
-                }
-            },
-            Default  = (Program)
-                "{\"$type\":\"Program\",\"Caption\":\"Program\",\"Definitions\":{\"Yes\":{\"$type\":\"Data\",\"Format\":\"Choice\",\"Value\":\"Yes\"},\"No\":{\"$type\":\"Data\",\"Format\":\"Choice\",\"Value\":\"No\"}},\"Qualifications\":{\"$type\":\"Conclusions.Drop\",\"Caption\":\"Abort Processing\"},\"Application\":{\"$type\":\"Application\",\"Fields\":{\"Service Address\":\"Address\",\"Medical Device\":\"Choice\",\"RRP\":\"Choice\",\"Utility\":\"Text\",\"Residence Address\":\"Address\",\"Bill Amount\":\"Numbers.Decimal\",\"Bill Type\":\"Text\",\"Service Type\":\"Text\",\"Dwelling\":\"Text\",\"Electric Vehicle\":\"Choice\",\"3CE Enrollment\":\"Choice\",\"Water System\":\"Text\",\"Household Members\":\"Numbers.Integer\",\"Household Income\":\"Numbers.Decimal\",\"Rebate Recived\":\"Choice\",\"LIHEAP Qualified\":\"Choice\",\"Home Ownership Status\":\"Text\",\"Age\":\"Numbers.Integer\",\"Fixed Income\":\"Choice\"}}}",
-            Crap = new Program {
-               Application = {
-                    Fields = {
-                        { "Full Name", "Text" },
-                        { "Address", "Address" },
-                        { "Household Income", "Number" },
-                        { "Household Members", "Integer" }
-                    }
-                },
+        
+        public static dynamic ProgramFragments = new {
+            Application = new {
+                Fields = new Enflow.Engine.FieldCollection {
+                    {"First Name", Name(typeof(Text)) },
+                    {"Middle Initial", Name(typeof(Text1)) },
+                    {"Last Name", Name(typeof(Text)) },
+                    {"Mailing Address", Name(typeof(Address))},
+                    {"E-Mail Address", Name(typeof(Email))},
 
-                Definitions = {
-                    { "Fibby", new Fibonacci() },
-                    { "Maximum Income", new Data {
-                        Value = "100000.00", Format = "Number"
-                    }},
-                    { "Minimum Income", new Data {
-                        Value = "1.00", Format = "Number"
-                    }},
-                    { "Large Household Exemption", new Data {
-                        Value = "6", Format = "Integer"
-                    }},
-                    { "Service Locations", new Table {
-                        Format = "City",
-                        Values = {
-                            "San Diego, CA",
-                            "Oakland, CA",
-                            "Santa Cruz, CA",
-                            "Watsonville, CA"
-                        }
-                    }}
-                },
+                    {"Household Members", Name(typeof(Count))},
+                    {"Household Income", Name(typeof(Currency))},
 
-                Qualifications = new IsNotEmpty {
-                    Caption = "Ensure the Name Section is Completed",
-                    From = $"{Program.Sections.Input}:Full Name",
-                    Yes = new MatchesListItem {
-                        Caption = "Check if they are in the service area",
-                        From = $"{Program.Sections.Input}:Address",
-                        ComparedTo = $"{Program.Sections.Definition}:Service Locations",
-                        Yes = new GreaterThan {
-                            Caption = "Test to see if they are under the maximum income",
-                            From = $"{Program.Sections.Input}:Household Income",
-                            ComparedTo = $"{Program.Sections.Definition}:Maximum Income",
-                            Yes = new LessThan { // really GTEQ in Disguise
-                                Caption = "See if they are exempt because of # of residents",
-                                From = $"{Program.Sections.Input}:Household Members",
-                                ComparedTo = $"{Program.Sections.Definition}:Large Household Exemption",
-                                Yes = new Reject(),
-                                No = new Accept()
-                            },
-                            No = new GreaterThan {
-                                Caption = "Test if the application meets mimimum income requirements",
-                                From = $"{Program.Sections.Input}:Household Income",
-                                ComparedTo = $"{Program.Sections.Definition}:Minimum Income"
-                            }
-                        }
-                    }
+                    {"Service Address", Name(typeof(Address)) },
+                    {"Service Building Type", Name(typeof(Building))},
+                    
+                    {"Utility ID", Name(typeof(Utility))},
+                    {"Account Number", Name(typeof(Enflow.Types.CSD.Accounts.Number)) },
+                    {"Bill Amount", Name(typeof(Currency)) },
+                    {"Delinquent", Name(typeof(Confirmation)) },
+                    {"Home Ownership Status", Name(typeof(Confirmation))},
+
+                    {"LIHEAP Qualified", Name(typeof(Confirmation))},
+                    {"Rebate Received", Name(typeof(Confirmation))},
+                    {"3CE Enrollment", Name(typeof(Confirmation))},
+                    {"Active Reduced Rate Program", Name(typeof(Confirmation))},
+                    {"Fixed Income", Name(typeof(Confirmation)) },
                 }
             }
+        };
+        public static dynamic Programs { get; } = new {
+            Empty = new Enflow.Program {
+                Application = {
+                    
+                },
+                Definitions = {
+
+                },
+                Process = new Reject()
+            },
+            Default  = new Enflow.Program {
+                Application = {
+                    Fields = ProgramFragments.Application.Fields
+                },
+                Definitions = {
+                    {"Yes", new Data("Yes", "Choice") },
+                    {"No", new Data("No", "Choice") },
+                    {"maybe", new AddressBuilder() }
+                },
+                Process = new Enflow.Qualifications.Income.Offset.CaliforniaAMI {
+                    Multiplier = "2",
+                    Address = "Input:Service Address",
+                    HouseholdIncome = "Input:Household Income",
+                    HouseholdMembers = "Input:Household Members",
+                    Rejected = new Enflow.Outcomes.Reject { Caption = "Rejected Item" },
+                    Qualified = new Enflow.Outcomes.AcceptToST { Caption = "Approve with ServTraq" }
+                }
+            },
         };
         public Process DefaultOutcome { get => new GreaterThan(); }
         public static ProgramModel DefaultProgramModel { get; } = new ProgramModel { Program = Programs.Default.Clone() };
